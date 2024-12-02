@@ -1,0 +1,17 @@
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:time_slider/Model/hive_class.dart';
+
+class TimezoneStates {
+  static bool isLoading = false;
+  static String selectedTimeZone = "UTC";
+  static List<String> timezoneselections = [
+  ];
+
+  // Async method to fetch and set the local timezone
+  static Future<void> initializeTimeZone() async {
+    String localTimezone = await FlutterTimezone.getLocalTimezone();
+    if (!timezoneselections.contains(localTimezone)) timezoneselections.add(localTimezone);
+    selectedTimeZone = localTimezone;
+    await HiveFunctions.saveTimeZones(selectedTimeZone: selectedTimeZone, timezoneList: timezoneselections);
+  }
+}
