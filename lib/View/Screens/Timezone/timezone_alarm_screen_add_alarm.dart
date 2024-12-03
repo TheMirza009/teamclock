@@ -160,8 +160,8 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                   onTap: () => print("Low interest"),
                 ),
                 const CustomListTile(
-                  title: "Timezone",
-                  subtitle: "Cairo, Egypt",
+                  title: "Timezones",
+                  subtitle: "Cairo, Egypt\nKarachi Pakistan",
                 ),
                 // const CustomListTile(
                 //   title: "Alarm Settings",

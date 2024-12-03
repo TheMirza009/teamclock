@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ <!-- Existing permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Add this for notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="time_slider"
         android:name="${applicationName}"

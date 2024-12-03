@@ -49,7 +49,8 @@ class AlarmScreen extends ConsumerWidget {
         child: IconButton(
           onPressed: () => Navigator.push(
             context, 
-            CupertinoPageRoute(builder: (_) => const AddAlarmScreen())),
+            // CupertinoPageRoute(builder: (_) => const AddAlarmScreen())),
+            CupertinoModalPopupRoute(builder: (_) => const AddAlarmScreen())),
           icon: const Icon(Icons.add, size:35),
           // color: const Color.fromARGB(255, 55, 101, 187), // Icon color
           color: ThemeConstants.neutralblue,

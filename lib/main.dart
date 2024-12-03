@@ -1,9 +1,12 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:time_slider/Model/Dependency%20Classes/notification_setup.dart';
 import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
+import 'package:time_slider/View/Screens/notification_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -12,6 +15,13 @@ void main() async {
   tz.initializeTimeZones();
   await Hive.initFlutter();
   await Hive.openBox("timezones");
+  NotificationSetup.initializeNotification();
+
+  // Request notification permission
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  if (!isAllowed) {
+    await AwesomeNotifications().requestPermissionToSendNotifications();
+  }
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -41,7 +51,8 @@ class _MyAppState extends State<MyApp> {
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,
-        home: const TimezonesScreen(),
+        home: NotificationScreen(),
+        // home: const TimezonesScreen(),
         // home: ItemTraderScreen(),
       );
     });

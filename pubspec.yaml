@@ -45,6 +45,7 @@ dependencies:
   flutter_timezone: ^3.0.1
   flutter_riverpod: ^2.6.1
   just_audio: ^0.9.42
+  awesome_notifications: ^0.10.0
 
 dev_dependencies:
   flutter_test:
