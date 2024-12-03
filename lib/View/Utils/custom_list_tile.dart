@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:time_slider/View/Theme/themeconstants.dart';
 
 class CustomListTile extends StatelessWidget {
   final String title;
@@ -64,7 +65,7 @@ class CustomListTile extends StatelessWidget {
           onTap: onTap,
         ),
         showDivider 
-        ? const Divider(color: Colors.grey) 
+        ? ThemeConstants.greyDivider
         : const SizedBox.shrink(), // Assuming this is `greyDivider`
       ],
     );

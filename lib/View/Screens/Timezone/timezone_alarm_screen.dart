@@ -33,18 +33,26 @@ class AlarmScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
       ),
       floatingActionButton: Container(
-        width: 56.0, // Diameter of the button
-        height: 56.0,
+        width: 70.0, // Diameter of the button
+        height: 70.0,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainer,
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3), // Shadow color with some transparency
+              blurRadius: 6, // The blur effect of the shadow
+              offset: const Offset(-2, 4), // The offset of the shadow
+            ),
+          ],
         ),
         child: IconButton(
           onPressed: () => Navigator.push(
             context, 
             CupertinoPageRoute(builder: (_) => const AddAlarmScreen())),
           icon: const Icon(Icons.add, size:35),
-          color: const Color.fromARGB(255, 55, 101, 187), // Icon color
+          // color: const Color.fromARGB(255, 55, 101, 187), // Icon color
+          color: ThemeConstants.neutralblue,
         ),
       ),
       body: Padding(
@@ -53,19 +61,27 @@ class AlarmScreen extends ConsumerWidget {
           child: Column(
             children: [
               Column(
-                children: List.generate(4, (index) {
+                children: List.generate(8, (index) {
                   final alarmProvider = StateProvider<bool>((ref) => false);
                   final locations = [
                     "Cairo, Egypt",
                     "New York, USA",
                     "Argentina",
-                    "Kabul, Afghanistan"
+                    "Kabul, Afghanistan",
+                    "Kabul, Afghanistan",
+                    "Kabul, Afghanistan",
+                    "Kabul, Afghanistan",
+                    "Kabul, Afghanistan",
                   ];
                   final titles = [
                     "Meeting with Clients",
                     "Visit the new dealership dealership dealership dealership",
                     "Skype meeting",
-                    "Frontend review"
+                    "Frontend review",
+                    "Frontend review",
+                    "Frontend review",
+                    "Frontend review",
+                    "Frontend review",
                   ];
                   return Column(
                     children: [

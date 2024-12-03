@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:time_slider/View/Screens/settings_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
@@ -7,10 +8,9 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class TimeFunctions {
-
   static Widget formatTime({
     required tz.TZDateTime current,
-    required BuildContext context, 
+    required BuildContext context,
     bool showSeconds = false,
     bool show12HourFormat = false, // Parameter for 24-hour format
   }) {
@@ -21,7 +21,7 @@ class TimeFunctions {
     final formattedHour = hour.toString().padLeft(2, '0');
     final formattedMinutes = current.minute.toString().padLeft(2, '0');
     final formattedSeconds = current.second.toString().padLeft(2, '0');
-    final isAM = show12HourFormat ? (current.hour < 12 ? 'AM' : 'PM') : ''; 
+    final isAM = show12HourFormat ? (current.hour < 12 ? 'AM' : 'PM') : '';
     // No AM/PM for 24-hour format
 
     // Style selection
@@ -71,29 +71,64 @@ class TimeFunctions {
 
   // STOP WATCH FUNCTIONS
   static String formatDuration(Duration duration) {
-      String twoDigits(int n) => n.toString().padLeft(2, "0");
-      final hours = twoDigits(duration.inHours);
-      final minutes = twoDigits(duration.inMinutes.remainder(60));
-      final seconds = twoDigits(duration.inSeconds.remainder(60));
-      final milliseconds = (duration.inMilliseconds % 100).toString().padLeft(2, "0");
-      return hours != "00" ? "$hours:$minutes:$seconds.$milliseconds" : "$minutes:$seconds.$milliseconds";
-    }
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    final milliseconds =
+        (duration.inMilliseconds % 100).toString().padLeft(2, "0");
+    return hours != "00"
+        ? "$hours:$minutes:$seconds.$milliseconds"
+        : "$minutes:$seconds.$milliseconds";
+  }
 
-
-
+  // STOP WATCH FUNCTIONS
+  static Row formatDurationRow(Duration duration) {
+    TextStyle robotoMono = GoogleFonts.robotoMono(fontSize: 80);
+    double presentHourSize = 60;
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    final hours = twoDigits(duration.inHours);
+    final minutes = twoDigits(duration.inMinutes.remainder(60));
+    final seconds = twoDigits(duration.inSeconds.remainder(60));
+    final milliseconds =
+        (duration.inMilliseconds % 100).toString().padLeft(2, "0");
+    // return hours != "00"
+    // ? "$hours:$minutes:$seconds.$milliseconds"
+    // : "$minutes:$seconds.$milliseconds";
+    return hours != "00"
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(hours, style: GoogleFonts.robotoMono(fontSize: 50)),
+              Text(minutes, style: GoogleFonts.robotoMono(fontSize: 50)),
+              Text(seconds, style: GoogleFonts.robotoMono(fontSize: 50)),
+              Text(milliseconds, style: GoogleFonts.robotoMono(fontSize: 50)),
+            ],
+          )
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(minutes, style: robotoMono),
+              Text(":", style: robotoMono),
+              Text(seconds, style: robotoMono),
+              Text(":", style: robotoMono),
+              Text(milliseconds, style: robotoMono),
+            ],
+          );
+  }
 
   // POMODORO Time Format
   static String formatTimeFromSeconds(int seconds) {
-  final hours = seconds ~/ 3600;
-  final minutes = (seconds % 3600) ~/ 60;
-  final remainingSeconds = seconds % 60;
+    final hours = seconds ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
+    final remainingSeconds = seconds % 60;
 
-  if (hours > 0) {
-    return '${NumberFormat("00").format(hours)}:${NumberFormat("00").format(minutes)}:${NumberFormat("00").format(remainingSeconds)}';
-  } else {
-    return '${NumberFormat("00").format(minutes)}:${NumberFormat("00").format(remainingSeconds)}';
+    if (hours > 0) {
+      return '${NumberFormat("00").format(hours)}:${NumberFormat("00").format(minutes)}:${NumberFormat("00").format(remainingSeconds)}';
+    } else {
+      return '${NumberFormat("00").format(minutes)}:${NumberFormat("00").format(remainingSeconds)}';
+    }
   }
-}
 
   // Format Time from datetime
   static String formatTimeFromDateTime(DateTime dateTime) {
@@ -125,31 +160,29 @@ class TimeFunctions {
             : '$sign${minutes}m');
   }
 
+  // Get Offset function
+  static String getTimezoneOffset(String timezone) {
+    // Get location from timezone
+    final location = tz.getLocation(timezone);
+    final now = tz.TZDateTime.now(location);
+    final offset = now.timeZoneOffset;
 
-    // Get Offset function
-    static String getTimezoneOffset(String timezone) {
+    // Format the offset with the sign
+    final hours = offset.inHours.abs().toString().padLeft(2, '0');
+    final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
+    final sign = offset.isNegative ? '-' : '+';
 
-      // Get location from timezone
-      final location = tz.getLocation(timezone);
-      final now = tz.TZDateTime.now(location);
-      final offset = now.timeZoneOffset;
+    return 'GMT$sign$hours:$minutes';
+  }
 
-      // Format the offset with the sign
-      final hours = offset.inHours.abs().toString().padLeft(2, '0');
-      final minutes = (offset.inMinutes.abs() % 60).toString().padLeft(2, '0');
-      final sign = offset.isNegative ? '-' : '+';
-
-      return 'GMT$sign$hours:$minutes';
-    }
-
-    static String replaceLongWords(String input) {
+  static String replaceLongWords(String input) {
     // Split the input into words
     return input.split(' ').map((word) {
       return word.length > 10 ? word.replaceAll(' ', '\n') : word;
     }).join(' ');
   }
 
-    // Mapping of timezones to city-country pairs
+  // Mapping of timezones to city-country pairs
   static String getCityAndCountryFromTimezone(String timezone) {
     const Map<String, String> timezoneToCityCountry = {
       'Africa/Abidjan': 'Abidjan, Ivory Coast',
@@ -533,120 +566,119 @@ class TimeFunctions {
       'Pacific/Tongatapu': 'Nukuʻalofa, Tonga',
       'Pacific/Wallis': 'Wallis Island, France',
       'Pacific/Whangarei': 'Whangarei, New Zealand',
-      'UTC' : "Universal Standard Time"
+      'UTC': "Universal Standard Time"
     };
 
     return timezoneToCityCountry[timezone] ?? timezone;
   }
 
   static String getRegionFromAbbreviation(String abbreviation) {
-  const Map<String, String> abbreviationToRegion = {
-    'ACDT': 'Australia/Adelaide',
-    'ACST': 'Australia/Adelaide',
-    'ACT': 'Australia/Darwin',
-    'ADT': 'America/Halifax',
-    'AEDT': 'Australia/Sydney',
-    'AEST': 'Australia/Brisbane',
-    'AKDT': 'America/Anchorage',
-    'AKST': 'America/Anchorage',
-    'AMST': 'Asia/Yerevan',
-    'AMT': 'Asia/Yekaterinburg',
-    'ART': 'America/Argentina/Buenos_Aires',
-    'AST': 'Asia/Riyadh',
-    'AWDT': 'Australia/Perth',
-    'AWST': 'Australia/Perth',
-    'AZOST': 'Atlantic/Azores',
-    'AZT': 'Asia/Baku',
-    'BNT': 'Asia/Brunei',
-    'BRT': 'America/Sao_Paulo',
-    'BST': 'Asia/Dhaka',
-    'CCT': 'Asia/Choibalsan',
-    'CDT': 'America/Chicago',
-    'CEST': 'Europe/Berlin',
-    'CET': 'Europe/Berlin',
-    'CHADT': 'Pacific/Chatham',
-    'CHAST': 'Pacific/Chatham',
-    'CKT': 'Pacific/Rarotonga',
-    'CLT': 'America/Santiago',
-    'COT': 'America/Bogota',
-    'CST': 'America/Chicago',
-    'CT': 'Asia/Shanghai',
-    'CVT': 'Atlantic/Cape_Verde',
-    'ChST': 'Pacific/Guam',
-    'EADT': 'Pacific/Funafuti',
-    'EAST': 'Pacific/Funafuti',
-    'EET': 'Europe/Bucharest',
-    'EEST': 'Europe/Helsinki',
-    'EST': 'America/New_York',
-    'ET': 'America/New_York',
-    'FET': 'Europe/Minsk',
-    'FJT': 'Pacific/Fiji',
-    'FKT': 'Atlantic/Stanley',
-    'GAMT': 'Pacific/Gambier',
-    'GMT': 'Etc/GMT',
-    'GST': 'Asia/Dubai',
-    'HADT': 'America/Adak',
-    'HAST': 'America/Adak',
-    'HKT': 'Asia/Hong_Kong',
-    'HMT': 'Asia/Kolkata',
-    'HST': 'Pacific/Honolulu',
-    'ICT': 'Asia/Bangkok',
-    'IDT': 'Asia/Jerusalem',
-    'IRDT': 'Asia/Tehran',
-    'IRST': 'Asia/Tehran',
-    'IST': 'Asia/Kolkata',
-    'JST': 'Asia/Tokyo',
-    'KGT': 'Asia/Bishkek',
-    'KST': 'Asia/Seoul',
-    'MDT': 'America/Denver',
-    'MSK': 'Europe/Moscow',
-    'MST': 'America/Denver',
-    'NCT': 'Pacific/Noumea',
-    'NDT': 'America/St_Johns',
-    'NFT': 'Pacific/Norfolk',
-    'NST': 'Pacific/Auckland',
-    'NZDT': 'Pacific/Auckland',
-    'NZST': 'Pacific/Auckland',
-    'OMST': 'Asia/Omsk',
-    'PDT': 'America/Los_Angeles',
-    'PET': 'America/Lima',
-    'PETT': 'Asia/Kamchatka',
-    'PHT': 'Asia/Manila',
-    'PKT': 'Asia/Karachi',
-    'PMDT': 'America/Port_of_Spain',
-    'PMST': 'America/Port_of_Spain',
-    'PST': 'America/Los_Angeles',
-    'PWT': 'Pacific/Palau',
-    'PYST': 'America/Asuncion',
-    'RET': 'Indian/Reunion',
-    'RMT': 'Etc/GMT',
-    'ROTT': 'America/Boa_Vista',
-    'SAKST': 'Asia/Sakhalin',
-    'SAKT': 'Asia/Sakhalin',
-    'SAST': 'Africa/Johannesburg',
-    'SGT': 'Asia/Singapore',
-    'SRT': 'America/Paramaribo',
-    'SST': 'Pacific/Apia',
-    'SYOT': 'Antarctica/Syowa',
-    'TJT': 'Asia/Dushanbe',
-    'TKT': 'Pacific/Tokelau',
-    'TLT': 'Asia/Dili',
-    'TMT': 'Asia/Ashgabat',
-    'TOST': 'Pacific/Tongatapu',
-    'TOT': 'Pacific/Tongatapu',
-    'UTC': 'Etc/UTC',
-    'WAKT': 'Pacific/Wake',
-    'WAST': 'Africa/Harare',
-    'WET': 'Europe/Lisbon',
-    'WIT': 'Asia/Jakarta',
-    'WITA': 'Asia/Makassar',
-    'WST': 'Australia/Perth',
-    'WT': 'Etc/GMT',
-    'YAKT': 'Asia/Yakutsk',
-    'YEKT': 'Asia/Yekaterinburg',
-  };
+    const Map<String, String> abbreviationToRegion = {
+      'ACDT': 'Australia/Adelaide',
+      'ACST': 'Australia/Adelaide',
+      'ACT': 'Australia/Darwin',
+      'ADT': 'America/Halifax',
+      'AEDT': 'Australia/Sydney',
+      'AEST': 'Australia/Brisbane',
+      'AKDT': 'America/Anchorage',
+      'AKST': 'America/Anchorage',
+      'AMST': 'Asia/Yerevan',
+      'AMT': 'Asia/Yekaterinburg',
+      'ART': 'America/Argentina/Buenos_Aires',
+      'AST': 'Asia/Riyadh',
+      'AWDT': 'Australia/Perth',
+      'AWST': 'Australia/Perth',
+      'AZOST': 'Atlantic/Azores',
+      'AZT': 'Asia/Baku',
+      'BNT': 'Asia/Brunei',
+      'BRT': 'America/Sao_Paulo',
+      'BST': 'Asia/Dhaka',
+      'CCT': 'Asia/Choibalsan',
+      'CDT': 'America/Chicago',
+      'CEST': 'Europe/Berlin',
+      'CET': 'Europe/Berlin',
+      'CHADT': 'Pacific/Chatham',
+      'CHAST': 'Pacific/Chatham',
+      'CKT': 'Pacific/Rarotonga',
+      'CLT': 'America/Santiago',
+      'COT': 'America/Bogota',
+      'CST': 'America/Chicago',
+      'CT': 'Asia/Shanghai',
+      'CVT': 'Atlantic/Cape_Verde',
+      'ChST': 'Pacific/Guam',
+      'EADT': 'Pacific/Funafuti',
+      'EAST': 'Pacific/Funafuti',
+      'EET': 'Europe/Bucharest',
+      'EEST': 'Europe/Helsinki',
+      'EST': 'America/New_York',
+      'ET': 'America/New_York',
+      'FET': 'Europe/Minsk',
+      'FJT': 'Pacific/Fiji',
+      'FKT': 'Atlantic/Stanley',
+      'GAMT': 'Pacific/Gambier',
+      'GMT': 'Etc/GMT',
+      'GST': 'Asia/Dubai',
+      'HADT': 'America/Adak',
+      'HAST': 'America/Adak',
+      'HKT': 'Asia/Hong_Kong',
+      'HMT': 'Asia/Kolkata',
+      'HST': 'Pacific/Honolulu',
+      'ICT': 'Asia/Bangkok',
+      'IDT': 'Asia/Jerusalem',
+      'IRDT': 'Asia/Tehran',
+      'IRST': 'Asia/Tehran',
+      'IST': 'Asia/Kolkata',
+      'JST': 'Asia/Tokyo',
+      'KGT': 'Asia/Bishkek',
+      'KST': 'Asia/Seoul',
+      'MDT': 'America/Denver',
+      'MSK': 'Europe/Moscow',
+      'MST': 'America/Denver',
+      'NCT': 'Pacific/Noumea',
+      'NDT': 'America/St_Johns',
+      'NFT': 'Pacific/Norfolk',
+      'NST': 'Pacific/Auckland',
+      'NZDT': 'Pacific/Auckland',
+      'NZST': 'Pacific/Auckland',
+      'OMST': 'Asia/Omsk',
+      'PDT': 'America/Los_Angeles',
+      'PET': 'America/Lima',
+      'PETT': 'Asia/Kamchatka',
+      'PHT': 'Asia/Manila',
+      'PKT': 'Asia/Karachi',
+      'PMDT': 'America/Port_of_Spain',
+      'PMST': 'America/Port_of_Spain',
+      'PST': 'America/Los_Angeles',
+      'PWT': 'Pacific/Palau',
+      'PYST': 'America/Asuncion',
+      'RET': 'Indian/Reunion',
+      'RMT': 'Etc/GMT',
+      'ROTT': 'America/Boa_Vista',
+      'SAKST': 'Asia/Sakhalin',
+      'SAKT': 'Asia/Sakhalin',
+      'SAST': 'Africa/Johannesburg',
+      'SGT': 'Asia/Singapore',
+      'SRT': 'America/Paramaribo',
+      'SST': 'Pacific/Apia',
+      'SYOT': 'Antarctica/Syowa',
+      'TJT': 'Asia/Dushanbe',
+      'TKT': 'Pacific/Tokelau',
+      'TLT': 'Asia/Dili',
+      'TMT': 'Asia/Ashgabat',
+      'TOST': 'Pacific/Tongatapu',
+      'TOT': 'Pacific/Tongatapu',
+      'UTC': 'Etc/UTC',
+      'WAKT': 'Pacific/Wake',
+      'WAST': 'Africa/Harare',
+      'WET': 'Europe/Lisbon',
+      'WIT': 'Asia/Jakarta',
+      'WITA': 'Asia/Makassar',
+      'WST': 'Australia/Perth',
+      'WT': 'Etc/GMT',
+      'YAKT': 'Asia/Yakutsk',
+      'YEKT': 'Asia/Yekaterinburg',
+    };
 
-  return abbreviationToRegion[abbreviation] ?? abbreviation;
-}
-
+    return abbreviationToRegion[abbreviation] ?? abbreviation;
+  }
 }

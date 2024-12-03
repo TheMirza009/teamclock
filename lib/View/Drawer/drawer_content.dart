@@ -57,7 +57,7 @@ class DrawerContent extends StatelessWidget {
             title: Text('Stopwatch', style: Theme.of(context).textTheme.displayMedium),
             onTap: () { 
               Navigator.pop(context);
-              navigation(context, const StopwatchScreen());
+              navigation(context, StopwatchScreen());
               },
           ),
           ListTile(

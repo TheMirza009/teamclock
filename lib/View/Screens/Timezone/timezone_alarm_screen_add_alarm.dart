@@ -28,6 +28,10 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
         color: primaryColor, fontWeight: FontWeight.bold);
     const greyDivider = Divider(color: ThemeConstants.dividerGrey);
 
+    const double itemExtentAll = 60;
+    final displayMedium = GoogleFonts.robotoMono(fontWeight: FontWeight.w300, fontSize: 22);
+    // final displayMedium = Theme.of(context).textTheme.displayMedium;
+
     return Scaffold(
       // appBar: AppBar(
       //   title:
@@ -36,7 +40,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
       //       fontWeight: FontWeight.w600,
       //       fontSize: ThemeConstants.getDynamicFontSize(20),),),
       // ),
-      body: Center(
+      body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           // mainAxisSize: MainAxisSize.min,
@@ -46,23 +50,29 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, size: 30)),
+                  icon: const Icon(Icons.close, size: 30),
+                  onPressed: () => Navigator.pop(context),
+                ),
                 const Column(
                   children: [
                     Text(
                       "Add Alarm",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     ),
-                    Text("Alarm sets off in 2 hours, 53 minutes",
-                        style: TextStyle(
-                            fontWeight: FontWeight.normal, fontSize: 10)),
+
+                    Text(
+                      "Alarm sets off in 2 hours, 53 minutes",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 10,
+                      ),
+                    ),
                   ],
                 ),
                 IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.check, size: 30))
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.check, size: 30),
+                ),
               ],
             ),
 
@@ -74,26 +84,25 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
 
             // Cupertino picker
             Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 15.0,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 15.0),
               child: SizedBox(
-                height: 200,
+                height: 300,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+
                     // AM/PM Picker
                     Expanded(
                       child: CupertinoPicker(
-                        itemExtent: 50,
+                        itemExtent: itemExtentAll,
                         onSelectedItemChanged: (index) {
                           setState(() {
                             selectedAmPmIndex = index;
                           });
                         },
-                        children: const [
-                          Center(child: Text("AM")),
-                          Center(child: Text("PM")),
+                        children: [
+                          Center(child: Text("AM", style: displayMedium)),
+                          Center(child: Text("PM", style: displayMedium)),
                         ],
                       ),
                     ),
@@ -102,7 +111,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     Expanded(
                       child: CupertinoPicker(
                         looping: true,
-                        itemExtent: 50,
+                        itemExtent: itemExtentAll,
                         onSelectedItemChanged: (index) {
                           setState(() {
                             selectedHourIndex = index;
@@ -111,8 +120,11 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                         children: List.generate(
                           12,
                           (index) => Center(
-                              child:
-                                  Text((index + 1).toString().padLeft(2, '0'))),
+                            child: Text(
+                              (index + 1).toString().padLeft(2, '0'),
+                              style: displayMedium,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -120,7 +132,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     Expanded(
                       child: CupertinoPicker(
                         looping: true,
-                        itemExtent: 50,
+                        itemExtent: itemExtentAll,
                         onSelectedItemChanged: (index) {
                           setState(() {
                             selectedMinuteIndex = index;
@@ -129,7 +141,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                         children: List.generate(
                           60,
                           (index) => Center(
-                              child: Text(index.toString().padLeft(2, '0'))),
+                              child: Text(index.toString().padLeft(2, '0'), style: displayMedium)),
                         ),
                       ),
                     ),

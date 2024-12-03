@@ -11,6 +11,7 @@ class ThemeConstants {
   }
 
   static const greyDivider = Divider(color: ThemeConstants.dividerGrey);
+  static TextStyle robotoMono = GoogleFonts.robotoMono(fontSize: 70);
 
 
   // Pomodoro declarations
@@ -138,8 +139,7 @@ class ThemeConstants {
           valueIndicatorColor: Colors.black,
           valueIndicatorShape: const PaddleSliderValueIndicatorShape(),
           valueIndicatorTextStyle: const TextStyle(color: Colors.white),
-),
-
+          ),
       );
 
   // Time Container Style
