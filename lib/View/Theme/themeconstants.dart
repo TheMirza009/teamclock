@@ -93,8 +93,26 @@ class ThemeConstants {
           headlineMedium: GoogleFonts.montserrat(fontSize: getDynamicFontSize(17), color: darkTitle, fontWeight: FontWeight.bold),
           displayMedium: GoogleFonts.montserrat(fontSize: getDynamicFontSize(18), color: darkTitle,),
         ),
+
+        // FLOATING ACTION BUTTON STYLING
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.amber
+        ),
+
+        // ANDROID TIME PICKER THEME
+        timePickerTheme: const TimePickerThemeData(
+          // backgroundColor: Colors.white,
+          hourMinuteTextStyle: TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            // color: Colors.blue,
+          ),
+          dayPeriodTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            // color: Colors.blueAccent,
+          ),
+          // entryModeIconColor: Colors.blue,
         ),
 
       );
@@ -140,6 +158,22 @@ class ThemeConstants {
           valueIndicatorShape: const PaddleSliderValueIndicatorShape(),
           valueIndicatorTextStyle: const TextStyle(color: Colors.white),
           ),
+
+          // ANDROID TIME PICKER THEME
+        timePickerTheme: const TimePickerThemeData(
+          // backgroundColor: Colors.white,
+          hourMinuteTextStyle: TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            // color: Colors.blue,
+          ),
+          dayPeriodTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            // color: Colors.blueAccent,
+          ),
+          // entryModeIconColor: Colors.blue,
+        ),
       );
 
   // Time Container Style

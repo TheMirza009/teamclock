@@ -62,7 +62,7 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
     }
   }
 
-  void _incrementCounter() async {
+  void _addTimeZone() async {
     showDialog(
       context: context,
       builder: (context) {
@@ -160,7 +160,7 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
               : _buildTimeZoneMiniWidgets(),
               
               TextButton(
-                onPressed: _incrementCounter,
+                onPressed: _addTimeZone,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),

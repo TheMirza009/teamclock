@@ -2,10 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_test_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen_add_alarm.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Alarm%20Components/alarm_tile.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class AlarmScreen extends ConsumerWidget {
   const AlarmScreen({super.key});
@@ -50,7 +53,14 @@ class AlarmScreen extends ConsumerWidget {
           onPressed: () => Navigator.push(
             context, 
             // CupertinoPageRoute(builder: (_) => const AddAlarmScreen())),
-            CupertinoModalPopupRoute(builder: (_) => const AddAlarmScreen())),
+            CupertinoModalPopupRoute(builder: (_) => AddAlarmScreen(
+              onTimezoneAdded: (String timezone, tz.TZDateTime selectedTime) {
+            ref.read(alarmsProvider.notifier).state = [
+              ...ref.read(alarmsProvider),
+              AlarmItem(timezone: timezone, selectedTime: selectedTime),
+            ];
+          },
+            ))),
           icon: const Icon(Icons.add, size:35),
           // color: const Color.fromARGB(255, 55, 101, 187), // Icon color
           color: ThemeConstants.neutralblue,

@@ -1,13 +1,17 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:time_slider/Model/Dependency%20Classes/app_lifecycle_provider.dart';
+import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
 import 'package:time_slider/Model/Provider%20Classes/task_manager_class.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Pomodoro%20Dialogues/tuning_dialogue_ios.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Segmented%20Control/pomodoro_segmented_control.dart';
+import 'package:time_slider/ViewModel/pomodoro_functions.dart';
 import 'package:time_slider/ViewModel/timefunctions.dart';
 
 
@@ -21,6 +25,32 @@ class PomodoroMainRiverpod extends ConsumerStatefulWidget {
 class _PomodoroTimerState extends ConsumerState<PomodoroMainRiverpod> {
   final timerNotifierProvider = PomodoroStates.timerNotifierProvider;
   final timerDurationsNotifierProvider = PomodoroStates.timerDurationsNotifierProvider;
+
+  // static void showPomodoroNotificationOnStart(WidgetRef ref) {
+  //   AwesomeNotifications().createNotification(
+  //     content: NotificationContent(
+  //       id: 1,
+  //       channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
+  //       title: 'Pomodoro',
+  //       body: "Focus timer is running.",
+  //       notificationLayout: NotificationLayout.BigText,
+  //     ),
+  //     actionButtons: [
+  //       NotificationActionButton(
+  //         key: 'pause',
+  //         label: 'pause',
+  //       ),
+  //       NotificationActionButton(
+  //         key: 'reset',
+  //         label: 'Reset',
+  //       ),
+  //       NotificationActionButton(
+  //         key: 'break',
+  //         label: 'Break',
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // @override
   // void initState() {
@@ -38,36 +68,8 @@ class _PomodoroTimerState extends ConsumerState<PomodoroMainRiverpod> {
   //   });
   // }
 
-  @override
-  Widget build(BuildContext context) {
-    ThemeData themeContext = Theme.of(context);
-    Size mediaSize = MediaQuery.sizeOf(context);
-
-    final timerValue = ref.watch(timerNotifierProvider);
-    final tabIndex = ref.watch(PomodoroStates.segmentedControlValue);
-    final isPlaying = ref.watch(PomodoroStates.isPlayingProvider);
-
-    toggleTimer() {
-      isPlaying 
-      ? ref.read(timerNotifierProvider.notifier).pause() 
-      : ref.read(timerNotifierProvider.notifier).play();
-      ref.read(PomodoroStates.isPlayingProvider.notifier).state = !isPlaying;
-    }
-
-    handleSegmentChange(int value) {
-      ref.read(timerNotifierProvider.notifier).pause();
-      ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
-      ref.read(PomodoroStates.segmentedControlValue.notifier).state = value;
-      ref.read(timerDurationsNotifierProvider.notifier).resetAllTimers();
-    }
-
-    resetTimerFunction() {
-      ref.read(timerNotifierProvider.notifier).pause();
-      ref.read(timerDurationsNotifierProvider.notifier).resetAllTimers();
-      ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
-    }
-
-    // ref.listen<int>(timerNotifierProvider, (previous, current) {
+//? TO be added in build method
+  // ref.listen<int>(timerNotifierProvider, (previous, current) {
     //     if (current >= 3600) {
     //       debugPrint("Timer value reached or exceeded 3600 seconds!");
     //       // Trigger any state or perform actions here
@@ -75,77 +77,71 @@ class _PomodoroTimerState extends ConsumerState<PomodoroMainRiverpod> {
     //     }
     //   });
 
-    void testReset() {
-      ref.read(timerDurationsNotifierProvider.notifier).state =  Map<int, int>.from({0: 3, 1: 3, 2: 3});
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-        backgroundColor: themeContext.colorScheme.surfaceContainer,
-        content: Row(children: [
-          Text('Test Reset: ', style: ThemeConstants.montserratBold(context)),
-          Text('Timer set to 3 seconds.', style: TextStyle(color: themeContext.colorScheme.primary)),
-        ],),
-        
-        duration: const Duration(seconds: 1),
-      ));
-    }
+  @override
+Widget build(BuildContext context) {
+  ThemeData themeContext = Theme.of(context);
+  Size mediaSize = MediaQuery.sizeOf(context);
 
-    return Center(
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          height: ThemeConstants.screenHeight * 0.33,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
+  final timerValue = ref.watch(PomodoroStates.timerNotifierProvider);
+  final tabIndex = ref.watch(PomodoroStates.segmentedControlValue);
+  final isPlaying = ref.watch(PomodoroStates.isPlayingProvider);
 
-                // MAIN SEGMENTED CONTROLS : FOCUS | SHORT BREAK | LONG BREAK
-                MainSegmentedControls(
-                  timerTab: tabIndex,
-                  onSegmentChanged: (value) => setState(() {
-                    handleSegmentChange(value);
-                  }),
-                ),
-
-                // MAIN COUNTDOWN TIMER
-                GestureDetector(
-                  onTap: () => testReset(),
-                  child: Text(
-                    TimeFunctions.formatTimeFromSeconds(timerValue),
-                    style: timerValue >= 3600
-                        ? themeContext.textTheme.titleMedium
-                        : themeContext.textTheme.titleLarge,
-                  ),
-                ),
-
-                // CONTROL BUTTONS
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: controlButtons(
-                    ref: ref,
-                    isPlaying: isPlaying,
-                    mediaSize: mediaSize,
-                    themeContext: themeContext,
-                    onPlayPressed: toggleTimer,
-                    onResetPressed: resetTimerFunction,
-                    onTunePressed: () => showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) => const TuningDialogueIOS()
-                    ),
-                  ),
-                ),
-              ],
+  return Center(
+    child: Container(
+      margin: const EdgeInsets.all(10),
+      height: ThemeConstants.screenHeight * 0.33,
+      decoration: BoxDecoration(
+        color: themeContext.colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // MAIN SEGMENTED CONTROLS
+            MainSegmentedControls(
+              timerTab: tabIndex,
+              onSegmentChanged: (value) => setState(() {
+                PomodoroFunctions.handleSegmentChange(ref, value);
+              }),
             ),
-          ),
+
+            // MAIN COUNTDOWN TIMER
+            GestureDetector(
+              onTap: () => PomodoroFunctions.testReset(ref, context),
+              child: Text(
+                TimeFunctions.formatTimeFromSeconds(timerValue),
+                style: timerValue >= 3600
+                    ? themeContext.textTheme.titleMedium
+                    : themeContext.textTheme.titleLarge,
+              ),
+            ),
+
+            // CONTROL BUTTONS
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: controlButtons(
+                ref: ref,
+                isPlaying: isPlaying,
+                mediaSize: mediaSize,
+                themeContext: themeContext,
+                onPlayPressed: () => PomodoroFunctions.toggleTimer(ref, isPlaying),
+                onResetPressed: () => PomodoroFunctions.resetTimer(ref, context),
+                onTunePressed: () => showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) => const TuningDialogueIOS(),
+                ),
+              ),
+            ),
+          ],
         ),
-    );
-  }
+      ),
+    ),
+  );
+}
 
   Widget controlButtons({
     required WidgetRef ref,

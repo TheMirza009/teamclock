@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/custom_list_tile.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class AddAlarmScreen extends StatefulWidget {
-  const AddAlarmScreen({super.key});
+  final void Function(String timezone, tz.TZDateTime selectedTime) onTimezoneAdded;
+  const AddAlarmScreen({required this.onTimezoneAdded, super.key});
 
   @override
   State<AddAlarmScreen> createState() => _AddAlarmScreenState();

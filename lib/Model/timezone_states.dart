@@ -4,8 +4,7 @@ import 'package:time_slider/Model/hive_class.dart';
 class TimezoneStates {
   static bool isLoading = false;
   static String selectedTimeZone = "UTC";
-  static List<String> timezoneselections = [
-  ];
+  static List<String> timezoneselections = [];
 
   // Async method to fetch and set the local timezone
   static Future<void> initializeTimeZone() async {

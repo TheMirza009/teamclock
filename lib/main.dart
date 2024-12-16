@@ -2,11 +2,10 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:time_slider/Model/Dependency%20Classes/notification_setup.dart';
+import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
 import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
 import 'package:time_slider/Model/hive_class.dart';
-import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
-import 'package:time_slider/View/Screens/notification_screen.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_test_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -15,7 +14,7 @@ void main() async {
   tz.initializeTimeZones();
   await Hive.initFlutter();
   await Hive.openBox("timezones");
-  NotificationSetup.initializeNotification();
+  NotificationController.initializeNotification();
 
   // Request notification permission
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
@@ -37,7 +36,7 @@ class _MyAppState extends State<MyApp> {
   // 1 = Timezones
   // 2 = SelectedTimeZonez
   // 3 = ThemeMode
-  // 4 = Tasklist
+  // 4 = Tasklist.
   // 5 = Settings
 
   @override
@@ -45,15 +44,20 @@ class _MyAppState extends State<MyApp> {
     ThemeConstants.screenWidth = MediaQuery.sizeOf(context).width;
     ThemeConstants.screenHeight = MediaQuery.sizeOf(context).height;
     return Consumer(builder: (context, ref, child) {
+
+      // Riverpod-based initializations
       HiveFunctions.loadSettings(ref);
+      NotificationController.setListeners(ref);
+
+      // MAIN Material App
       return MaterialApp(
         title: 'Time Slider',
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,
-        home: NotificationScreen(),
+        home: const AlarmListScreen(),
         // home: const TimezonesScreen(),
-        // home: ItemTraderScreen(),
+        // home: NotificationScreen(),
       );
     });
   }

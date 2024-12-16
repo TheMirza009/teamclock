@@ -5,36 +5,49 @@ import 'package:time_slider/Model/pomodoro_states.dart';
 import 'package:time_slider/ViewModel/timefunctions.dart';
 
 class NotificationScreen extends ConsumerWidget {
-    final timerNotifierProvider = PomodoroStates.timerNotifierProvider;
+  NotificationScreen({super.key});
+   
+  final timerNotifierProvider = PomodoroStates.timerNotifierProvider;
 
-  void showNotificationWithButtons(WidgetRef ref) {
+  void showPomodoroNotification(WidgetRef ref) {
     final timerValue = ref.watch(timerNotifierProvider);
     AwesomeNotifications().createNotification(
-  content: NotificationContent(
-    id: 1,
-    channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
-    title: 'Pomodoro : FOCUS',
-    body: '${TimeFunctions.formatTimeFromSeconds(timerValue)}',
-  ),
-  actionButtons: [
-    NotificationActionButton(
-      key: 'pause',
-      label: 'Pause',
-    ),
-    NotificationActionButton(
-      key: 'reset',
-      label: 'Reset',
-    ),
-    NotificationActionButton(
-      key: 'break',
-      label: 'Break',
-    ),
-  ],
-);
+      content: NotificationContent(
+        id: 1,
+        channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
+        title: 'Pomodoro',
+        body: "Focus timer is running.",
+        notificationLayout: NotificationLayout.BigText,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'play',
+          label: 'play',
+        ),
+        NotificationActionButton(
+          key: 'reset',
+          label: 'Reset',
+        ),
+        NotificationActionButton(
+          key: 'break',
+          label: 'Break',
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+//     AwesomeNotifications(). ((receivedNotification) {
+//   if (receivedNotification.actionButtonKey == 'accept') {
+//     print('Accepted!');
+//   } else if (receivedNotification.actionButtonKey == 'decline') {
+//     print('Declined!');
+//   }
+// });
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -43,9 +56,14 @@ class NotificationScreen extends ConsumerWidget {
         ),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => showNotificationWithButtons(ref),
-          child: Text('Show Notification'),
+        child: Column(
+          children: [
+            Image.asset("Assets/icons/thunder_sun_72px_green.png"),
+            ElevatedButton(
+              onPressed: () => showPomodoroNotification(ref),
+              child: const Text('Show Notification'),
+            ),
+          ],
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
 
 // TimerNotifier manages the countdown timer
@@ -36,15 +37,14 @@ class PomodoroTimerNotifier extends StateNotifier<int> {
 //   }
 
   void playNotificationSoundFromJustSound() async {
-  final player = AudioPlayer();
-  try {
-    await player.setAsset('Assets/sound/notification.mp3'); // Correct path
-    await player.play();
-  } catch (e) {
-    print('Error playing sound: $e');
+    final player = AudioPlayer();
+    try {
+      await player.setAsset('Assets/sound/notification.mp3'); // Correct path
+      await player.play();
+    } catch (e) {
+      print('Error playing sound: $e');
+    }
   }
-}
-
 
   void checkAssetExists() async {
     try {
@@ -65,7 +65,10 @@ class PomodoroTimerNotifier extends StateNotifier<int> {
        timer.cancel(); // Stop timer when it reaches zero
       _resetTimer();  // Automatically reset the timer
       }
-      if (state < 1) playNotificationSoundFromJustSound();
+      if (state < 1) {
+        playNotificationSoundFromJustSound();
+        NotificationController.showPomodoroNotificationOnEnd();
+      }
       // playNotificationSound();
     });
   }

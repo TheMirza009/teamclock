@@ -1,8 +1,13 @@
 // ignore_for_file: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:time_slider/Model/Dependency%20Classes/app_lifecycle_provider.dart';
+import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
 import 'package:time_slider/Model/Provider%20Classes/task_manager_class.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
+import 'package:time_slider/View/Theme/themeconstants.dart';
+import '../Model/Dependency Classes/app_lifecycle_provider.dart';
 
 class PomodoroFunctions {
   static void tabShift({
@@ -11,10 +16,10 @@ class PomodoroFunctions {
     required int currentTab,
     required WidgetRef ref,
   }) async {
-    final pendingTasksNotifier =
-        ref.read(PomodoroStates.pendingTasksProvider.notifier); // Access pendingTasksProvider
-    final completedTasksNotifier = ref
-        .read(PomodoroStates.completedTasksProvider.notifier); // Access completedTasksProvider
+
+    // Task Watch
+    final pendingTasksNotifier = ref.read(PomodoroStates.pendingTasksProvider.notifier);
+    final completedTasksNotifier = ref.read(PomodoroStates.completedTasksProvider.notifier);
 
     // Take the item from PendingTasks and add it to
     if (currentTab == 0 && value == true) {
@@ -118,17 +123,70 @@ class PomodoroFunctions {
     }
   }
 
-  static toggleTimer({required WidgetRef ref, required bool isPlaying}) {
-    isPlaying
-        ? ref.read(PomodoroStates.timerNotifierProvider.notifier).pause()
-        : ref.read(PomodoroStates.timerNotifierProvider.notifier).play();
-    ref.read(PomodoroStates.isPlayingProvider.notifier).state =
-        !isPlaying; // Toggle state
+  //? POMODORO MAIN FUNCTIONS
+
+  static void toggleTimer(WidgetRef ref, bool isPlaying) {
+    final timerNotifier = ref.read(PomodoroStates.timerNotifierProvider.notifier);
+    final isPlayingNotifier = ref.read(PomodoroStates.isPlayingProvider.notifier);
+    
+    isPlaying 
+    ? timerNotifier.pause() 
+    : timerNotifier.play();
+    isPlayingNotifier.state = !isPlaying;
+
+    // NotificationController.showPomodoroNotificationOnStart(ref);
   }
 
-  static handleSegmentChange({required WidgetRef ref, required int value}) {
-    ref.read(PomodoroStates.isPlayingProvider.notifier).state = false; // Toggle state
+  static void handleSegmentChange(WidgetRef ref, int value) {
+    ref.read(PomodoroStates.timerNotifierProvider.notifier).pause();
+    ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
     ref.read(PomodoroStates.segmentedControlValue.notifier).state = value;
-    ref.read(PomodoroStates.timerNotifierProvider.notifier).reset();
+    ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier).resetAllTimers();
+  }
+
+  static void resetTimer(WidgetRef ref, BuildContext context) {
+    final themeContext = Theme.of(context);
+    final timerNotifier = ref.read(PomodoroStates.timerNotifierProvider.notifier);
+    final durationNotifier = ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier);
+    final isPlayingNotifier = ref.read(PomodoroStates.isPlayingProvider.notifier);
+    final appLifecycleState = ref.watch(appLifecycleProvider);
+
+    timerNotifier.pause();
+    durationNotifier.resetAllTimers();
+    isPlayingNotifier.state = false;
+    NotificationController.showPomodoroNotificationOnEnd();
+
+    if (appLifecycleState == AppLifecycleState.paused ||
+        appLifecycleState == AppLifecycleState.inactive) {
+      NotificationController.showPomodoroNotificationOnEnd();
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: themeContext.colorScheme.surfaceContainer,
+        content: Text(
+          "Timer reset.",
+          style: themeContext.textTheme.bodyMedium,
+        ),
+      ),
+    );
+  }
+
+  static void testReset(WidgetRef ref, BuildContext context) {
+    final themeContext = Theme.of(context);
+    ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier).state = Map<int, int>.from({0: 3, 1: 3, 2: 3});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: themeContext.colorScheme.surfaceContainer,
+        content: Row(
+          children: [
+            Text('Test Reset: ',  style: ThemeConstants.montserratBold(context)),
+            Text('Timer set to 3 seconds.', style: TextStyle(color: themeContext.colorScheme.primary)),
+          ],
+        ),
+        duration: const Duration(seconds: 1),
+      ),
+    );
   }
 }

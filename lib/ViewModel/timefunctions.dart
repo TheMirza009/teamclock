@@ -8,6 +8,32 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class TimeFunctions {
+
+  static String formatTimeOnly({
+    required tz.TZDateTime current,
+    required BuildContext context,
+    bool showSeconds = false,
+    bool show12HourFormat = false, // Parameter for 24-hour format
+  }) {
+    // Format the time based on 24-hour or 12-hour format
+    final hour = !show12HourFormat ? current.hour : (current.hour % 12 == 0 ? 12 : current.hour % 12);
+    final formattedHour = hour.toString().padLeft(2, '0');
+    final formattedMinutes = current.minute.toString().padLeft(2, '0');
+    // final formattedSeconds = current.second.toString().padLeft(2, '0');
+    final isAM = show12HourFormat ? (current.hour < 12 ? 'AM' : 'PM') : '';
+    // No AM/PM for 24-hour 
+
+    return "$formattedHour:$formattedMinutes $isAM";
+  }
+
+  static String formatHourOnly(current, show12HourFormat) {
+    final hour = !show12HourFormat 
+    ? current.hour 
+    : (current.hour % 12 == 0 ? 12 : current.hour % 12);
+    final formattedHour = hour.toString().padLeft(2, '0');
+    return formattedHour;
+  }
+
   static Widget formatTime({
     required tz.TZDateTime current,
     required BuildContext context,
@@ -15,9 +41,7 @@ class TimeFunctions {
     bool show12HourFormat = false, // Parameter for 24-hour format
   }) {
     // Format the time based on 24-hour or 12-hour format
-    final hour = !show12HourFormat
-        ? current.hour
-        : (current.hour % 12 == 0 ? 12 : current.hour % 12);
+    final hour = !show12HourFormat ? current.hour : (current.hour % 12 == 0 ? 12 : current.hour % 12);
     final formattedHour = hour.toString().padLeft(2, '0');
     final formattedMinutes = current.minute.toString().padLeft(2, '0');
     final formattedSeconds = current.second.toString().padLeft(2, '0');
