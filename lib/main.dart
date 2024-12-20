@@ -5,7 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
 import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
 import 'package:time_slider/Model/hive_class.dart';
-import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_test_screen.dart';
+import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -34,10 +34,11 @@ class _MyAppState extends State<MyApp> {
 
   //? HIVE SAVE CHEATSHEET
   // 1 = Timezones
-  // 2 = SelectedTimeZonez
+  // 2 = Counter
   // 3 = ThemeMode
-  // 4 = Tasklist.
-  // 5 = Settings
+  // 4 = Tasklist
+  // 5 = Alarms
+  // 6 = Settings
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +56,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,
-        home: const AlarmListScreen(),
-        // home: const TimezonesScreen(),
-        // home: NotificationScreen(),
+        home: const TimezonesScreen(),
       );
     });
   }

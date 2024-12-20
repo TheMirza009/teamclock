@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/Model/timezone_states.dart';
 import 'package:time_slider/View/Drawer/drawer_content.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
 import 'package:time_slider/View/Utils/Dialogues/themeselection_dialog_ios.dart';
@@ -97,7 +98,8 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
             onPressed: () => Navigator.push(
           context,
           CupertinoPageRoute(
-            builder: (_) => const AlarmScreen(),
+            builder: (_) => const AlarmListScreen(),
+            // builder: (_) => const AlarmScreen(),
           ),
         ),
             icon: Icon( CupertinoIcons.alarm, color: primaryColor),

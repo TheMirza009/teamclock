@@ -1,7 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
-import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_test_screen.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
 import 'package:time_slider/main.dart';
 
@@ -205,7 +206,7 @@ class NotificationController {
         }
 
         if (receivedAction.buttonKeyPressed == "stopalarm") {
-          final alarms = ref.watch(alarmsProvider);
+          final alarms = ref.watch(AlarmStates.alarmsProvider);
           print(receivedAction.title);
           AlarmFunctions.stopAlarm(alarms[0], ref);
         }

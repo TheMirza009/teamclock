@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Screens/settings_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
@@ -65,7 +66,8 @@ class DrawerContent extends StatelessWidget {
             title: Text('Alarms', style: Theme.of(context).textTheme.displayMedium),
             onTap: () { 
               Navigator.pop(context);
-              navigation(context, const AlarmScreen());
+              navigation(context, const AlarmListScreen());
+              // navigation(context, const AlarmScreen());
               },
           ),
           ListTile(

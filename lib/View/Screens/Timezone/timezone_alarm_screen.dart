@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
-import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_test_screen.dart';
+import 'package:time_slider/Model/alarm_states.dart';
+import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen_add_alarm.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Alarm%20Components/alarm_tile.dart';
@@ -25,6 +26,14 @@ class AlarmScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.push(
+              context, 
+              CupertinoPageRoute(
+                builder: (_) => const AlarmListScreen())), 
+                icon: const Icon(CupertinoIcons.alarm)),
+                ],
         title: Text(
           "Alarms",
           style: GoogleFonts.montserrat(
@@ -54,10 +63,10 @@ class AlarmScreen extends ConsumerWidget {
             context, 
             // CupertinoPageRoute(builder: (_) => const AddAlarmScreen())),
             CupertinoModalPopupRoute(builder: (_) => AddAlarmScreen(
-              onTimezoneAdded: (String timezone, tz.TZDateTime selectedTime) {
-            ref.read(alarmsProvider.notifier).state = [
-              ...ref.read(alarmsProvider),
-              AlarmItem(timezone: timezone, selectedTime: selectedTime),
+              onTimezoneAdded: (String alarmTitle, String timezone, tz.TZDateTime selectedTime) {
+            ref.read(AlarmStates.alarmsProvider.notifier).state = [
+              ...ref.read(AlarmStates.alarmsProvider),
+              AlarmItem(id: DateTime.now().microsecondsSinceEpoch, timezone: timezone, selectedTime: selectedTime, title: alarmTitle),
             ];
           },
             ))),

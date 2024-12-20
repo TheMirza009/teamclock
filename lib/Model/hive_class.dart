@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:time_slider/Model/Models/alarm_item.dart';
+import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
 import 'package:time_slider/Model/settings_states.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class HiveFunctions {
 
@@ -11,7 +17,8 @@ class HiveFunctions {
   // 2 = Counter
   // 3 = ThemeMode
   // 4 = Tasklist
-  // 5 = Settings
+  // 5 = Alarms
+  // 6 = Settings
   
   // Write Data
   static Future saveData({key, value}) async {
@@ -74,6 +81,74 @@ class HiveFunctions {
     return null;
   }
 
+
+  //? SAVE ALARM FUNCTIONS
+  static Future<void> saveAlarmList(List<AlarmItem> alarmList) async {
+
+    // Serialize AlarmItem list to JSON for saving
+    List<Map<String, dynamic>> jsonList = alarmList.map((alarm) {
+      return {
+        'id': alarm.id,
+        'title': alarm.title,
+        'timezone': alarm.timezone,
+        'selectedTime': alarm.selectedTime.toIso8601String(),
+        'isRinging': alarm.isRinging,
+        'isActive': alarm.isActive,
+      };
+    }).toList();
+
+    // Save the JSON-encoded list to storage
+    await saveData(key: 5, value: jsonEncode(jsonList));
+      print("Alarms saved:");
+    for ( var alarm in jsonList) {
+      print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}");
+    }
+  }
+
+  static Future<void> loadAlarms(WidgetRef ref) async {
+    try {
+      // Read the stored data
+      var storedValue = await readData(key: 5);
+
+      if (storedValue != null) {
+        // Decode the JSON data into a list of maps
+        List<dynamic> jsonList = jsonDecode(storedValue);
+
+        // Deserialize JSON into AlarmItem objects
+        List<AlarmItem> alarmList = jsonList.map((json) {
+          final timezone = json['timezone'];
+          final selectedTimeString = json['selectedTime'];
+          final loadedSelectedTime = tz.TZDateTime.parse(
+            tz.getLocation(timezone),
+            selectedTimeString,
+          );
+
+          return AlarmItem(
+            id: json['id'],
+            title: json['title'],
+            timezone: timezone,
+            selectedTime: loadedSelectedTime,
+            isRinging: json['isRinging'] ?? false,
+            isActive: json['isActive'] ?? true,
+          );
+        }).toList();
+
+        // Update the provider with the loaded alarms
+        ref.read(AlarmStates.alarmsProvider.notifier).state = alarmList;
+      } else {
+        // If no data is stored, set an empty list
+        ref.read(AlarmStates.alarmsProvider.notifier).state = [];
+      }
+    } catch (e, stackTrace) {
+      // Log or handle any errors
+      print('Error loading alarms: $e\n$stackTrace');
+      // Default to an empty list in case of an error
+      ref.read(AlarmStates.alarmsProvider.notifier).state = [];
+    }
+  }
+
+
+
   //? SETTINGS SAVE FUNCTIONS
   // Function to save seconds shown
   static Future<void> saveSettings(WidgetRef ref) async {
@@ -81,13 +156,13 @@ class HiveFunctions {
     final show12HourFormat = ref.watch(SettingsStates.show12HourFormat);
     final timeDurations = ref.watch(PomodoroStates.timerDurationsNotifierProvider);
     final settings = [  showSeconds, show12HourFormat, timeDurations ];
-    await saveData(key: 5, value: settings);
+    await saveData(key: 6, value: settings);
     print("Saved Settings: \n=>Show Seconds:  ${settings[0]} \n=>Show 12-Hour format: ${settings[1]} \n=>Time Durations map: ${settings[2]} ");
   }
 
   // Function to load settings
   static Future<void> loadSettings(WidgetRef ref) async {
-  final storedSettings = await readData(key: 5);
+  final storedSettings = await readData(key: 6);
 
   if (storedSettings != null) {
     ref.read(SettingsStates.showSeconds.notifier).state = storedSettings[0] ?? false;

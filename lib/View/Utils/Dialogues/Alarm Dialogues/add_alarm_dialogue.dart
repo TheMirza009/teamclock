@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
 import 'package:time_slider/ViewModel/timefunctions.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class AddTimezoneDialogTest extends StatefulWidget {
@@ -25,41 +24,44 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
     final now = TimeFunctions.formatTimeOnly(
       show12HourFormat: true,
       context: context, 
-      current: tz.TZDateTime.now(tz.getLocation(selectedTimezone)));
-    // final timeLeft = alarm.timeLeft(now);
+      current: tz.TZDateTime.now(tz.getLocation(selectedTimezone)),
+    );
 
     return AlertDialog(
       title: Text('Add Alarm', style: ThemeConstants.montserratBold(context)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          selectedTime != null 
-          ? Text("Selected Time: ${selectedTime?.hour ?? "Hour"}:${selectedTime?.minute ?? "Minute"}") 
-          : const Text("Please select an alarm time."),
-          // Text("$selectedTimezone Time: ${now.hour.toString().padLeft(2, "0") ?? "Hour"}:${now.minute.toString().padLeft(2, "0") ?? "Minute"}"),
-          Text("$selectedTimezone Time: $now"),
+          // Timezone and Alarm Time Information
+          Text(
+            selectedTime != null
+                ? "Selected Time: ${selectedTime?.hour ?? "Hour"}:${selectedTime?.minute ?? "Minute"}"
+                : "Please select an alarm time.",
+            style: TextStyle(fontSize: 16),
+          ),
+          SizedBox(height: 10),
+          Text("$selectedTimezone Time: $now", style: TextStyle(fontSize: 16)),
+          
+          // Timezone and Alarm Time Selection
           OutlinedButton(
-              onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AddTimezoneDialog(
-                        onTimezoneAdded: (timezone) {
-                          setState(() => selectedTimezone = timezone);
-                        },
-                      );
-                    },
-                  ),
-              child: Text("Timezone: $selectedTimezone", style: ThemeConstants.notBoldText(context))),
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) {
+                return AddTimezoneDialog(
+                  onTimezoneAdded: (timezone) {
+                    setState(() => selectedTimezone = timezone);
+                  },
+                );
+              },
+            ),
+            child: Text("Timezone: $selectedTimezone", style: ThemeConstants.notBoldText(context)),
+          ),
           OutlinedButton(
-            child: Text('Pick Alarm Time',
-                style: ThemeConstants.notBoldText(context)),
             onPressed: () async {
               final time = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.now(),
-                  );
+                context: context,
+                initialTime: TimeOfDay.now(),
+              );
               if (time != null) {
                 final now = tz.TZDateTime.now(tz.getLocation(selectedTimezone));
                 setState(() {
@@ -74,9 +76,17 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
                 });
               }
             },
+            child: Text('Pick Alarm Time', style: ThemeConstants.notBoldText(context)),
           ),
-          isEmpty ? const Text("Please select a Timezone and Alarm time to add new Alarm.", style: TextStyle(color: Colors.red))
-          : const SizedBox.shrink()
+          SizedBox(height: 20),
+          
+          // Error Message if fields are empty
+          isEmpty
+              ? const Text(
+                  "Please select a Timezone and Alarm time to add new Alarm.",
+                  style: TextStyle(color: Colors.red),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
       actions: [
@@ -90,11 +100,13 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
               widget.onTimezoneAdded(selectedTimezone, selectedTime!);
               Navigator.pop(context);
             } else {
-              isEmpty = true;
               setState(() {
-                Future.delayed(Duration(seconds: 2), () => setState(() {
+                isEmpty = true;
+              });
+              Future.delayed(const Duration(seconds: 2), () {
+                setState(() {
                   isEmpty = false;
-                }));
+                });
               });
             }
           },

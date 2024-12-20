@@ -10,6 +10,7 @@ class CustomListTile extends StatelessWidget {
   final bool showChevron;
   final bool showDivider;
   final Widget? trailingWidget;
+  final bool noTitle;
   const CustomListTile({
     super.key,
     required this.title,
@@ -18,6 +19,7 @@ class CustomListTile extends StatelessWidget {
     this.trailingWidget,
     this.showChevron = true,
     this.showDivider = true,
+    this.noTitle = false,
   });
 
   @override
@@ -41,30 +43,36 @@ class CustomListTile extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 150,
-                    child: Text(
-                      subtitle,
-                      textAlign: TextAlign.end,
-                      maxLines: 2,
-                      style: GoogleFonts.montserrat(
-                        fontSize: subtitleSize, 
-                        fontWeight: FontWeight.w500,
-                        
+                    child: AnimatedOpacity(
+                      opacity: noTitle || subtitle.isNotEmpty
+                          ? 1.0
+                          : 0.0, // Only fade in if noTitle is true and subtitle is not empty
+                      duration: const Duration(milliseconds: 300),
+                      child: Text(
+                        subtitle,
+                        textAlign: TextAlign.end,
+                        maxLines: 2,
+                        style: GoogleFonts.montserrat(
+                          fontSize: subtitleSize,
+                          fontWeight: FontWeight.w500,
+                          color: noTitle == true
+                              ? const Color.fromARGB(166, 201, 54, 44)
+                              : Theme.of(context).colorScheme.primary.withAlpha(100),
                         ),
-                      overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
-                  showChevron 
-                  ? const Icon(CupertinoIcons.right_chevron)
-                  : (trailingWidget != null 
-                    ? trailingWidget! 
-                    : const SizedBox.shrink()),
+                  showChevron
+                      ? const Icon(CupertinoIcons.right_chevron)
+                      : (trailingWidget != null ? trailingWidget! : const SizedBox.shrink()),
                 ],
               ),
             ],
           ),
           onTap: onTap,
         ),
-        showDivider 
+        showDivider
         ? ThemeConstants.greyDivider
         : const SizedBox.shrink(), // Assuming this is `greyDivider`
       ],
