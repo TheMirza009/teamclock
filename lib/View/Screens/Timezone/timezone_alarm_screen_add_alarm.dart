@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
 import 'package:time_slider/View/Utils/Dialogues/ringtone_selection_dialog.dart';
@@ -10,7 +11,7 @@ import 'package:time_slider/ViewModel/timefunctions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AddAlarmScreen extends StatefulWidget {
-  final void Function(String alarmTitle, String timezone, tz.TZDateTime selectedTime) onTimezoneAdded;
+  final void Function(String alarmTitle, String timezone, tz.TZDateTime selectedTime, String ringtone) onTimezoneAdded;
   const AddAlarmScreen({required this.onTimezoneAdded, super.key});
 
   @override
@@ -97,7 +98,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
                     if (selectedTime != null && alarmTitle != "") {
-                      widget.onTimezoneAdded(alarmTitle, selectedTimezone, selectedTime);
+                      widget.onTimezoneAdded(alarmTitle, selectedTimezone, selectedTime, ringtoneTitle);
                       Navigator.pop(context);
                     } else {
                       setState(() {
@@ -217,7 +218,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                 ),
                 CustomListTile(
                   title: "Ringtone",
-                  subtitle: ringtoneTitle,
+                  subtitle: Ringtones.extractTitle(ringtoneTitle),
                   onTap: () => showDialog(
                     context: context,
                     builder: (context) {

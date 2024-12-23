@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Screens/settings_screen.dart';
-import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen.dart';
 import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
 import 'package:time_slider/View/Screens/pomodoro_screen.dart';
 import 'package:time_slider/View/Screens/stopwatch_screen.dart';

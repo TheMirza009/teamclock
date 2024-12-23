@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 
 class RingtoneSelectionDialog extends StatefulWidget {
@@ -17,11 +18,7 @@ class _RingtoneSelectionDialogState extends State<RingtoneSelectionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> ringtones = [
-      "Basic Alarm",
-      "Fire Alarm",
-      "Siren",
-    ];
+    final List<String> ringtones = Ringtones.allRingtones.toList();
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -77,7 +74,7 @@ class _RingtoneSelectionDialogState extends State<RingtoneSelectionDialog> {
                                 child: const Icon(CupertinoIcons.check_mark, color: ThemeConstants.neutralblue),
                               ),
                               title: Text(
-                                ringtone,
+                                Ringtones.extractTitle(ringtone),
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               onTap: () {

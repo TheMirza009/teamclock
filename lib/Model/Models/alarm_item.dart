@@ -10,6 +10,7 @@ class AlarmItem {
   final String title;
   final String timezone;
   final tz.TZDateTime selectedTime;
+  final String ringtone;
   bool isRinging;
   bool isActive;
 
@@ -18,6 +19,7 @@ class AlarmItem {
     required this.title,
     required this.timezone,
     required this.selectedTime,
+    this.ringtone = 'Assets/sound/alarms/Basic Alarm.mp3',
     this.isRinging = false,
     this.isActive = true,
   });

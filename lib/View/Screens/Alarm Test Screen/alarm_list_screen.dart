@@ -42,9 +42,6 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
     super.dispose();
   }
 
-  String basicAlarm = 'Assets/sound/alarms/Basic Alarm.mp3';
-  String fireAlarm = 'Assets/sound/alarms/Fire Alarm.mp3';
-
   void _checkAlarms(Timer timer) {
     final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
 
@@ -56,7 +53,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
       && alarm.selectedTime.hour == now.hour && alarm.selectedTime.minute == now.minute
       && alarm.selectedTime.second == now.second && alarm.isActive == true) {
         alarm.isRinging = true;
-        AlarmFunctions.playAlarmSound(basicAlarm);
+        AlarmFunctions.playAlarmSound(alarm.ringtone);
         NotificationController.showAlarmNotification();
       }
     }
@@ -69,7 +66,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
       context: context,
       builder: (context) {
         return AddAlarmScreen(
-          onTimezoneAdded: (String alarmTitle, String timezone, tz.TZDateTime selectedTime) async {
+          onTimezoneAdded: (String alarmTitle, String timezone, tz.TZDateTime selectedTime, String ringtone) async {
              ref.read(AlarmStates.alarmsProvider.notifier).state = [
               ...ref.read(AlarmStates.alarmsProvider),
               AlarmItem(
@@ -77,6 +74,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
                 title: alarmTitle,
                 timezone: timezone, 
                 selectedTime: selectedTime,
+                ringtone: ringtone,
                 ),
             ];
             final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
