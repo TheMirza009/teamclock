@@ -2,16 +2,13 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
-import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/View/Drawer/drawer_content.dart';
 import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_card.dart';
-import 'package:time_slider/View/Screens/Timezone/timezone_alarm_screen_add_alarm.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
-import 'package:time_slider/View/Utils/Dialogues/Alarm%20Dialogues/add_alarm_dialogue.dart';
-import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
 import 'package:time_slider/View/Utils/Dialogues/themeselection_dialog_ios.dart';
 import 'package:time_slider/View/Utils/drawerIcon.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
@@ -25,15 +22,19 @@ class AlarmListScreen extends ConsumerStatefulWidget {
   ConsumerState<AlarmListScreen> createState() => _AlarmListScreenState();
 }
 
-class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
+class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerProviderStateMixin  {
   Timer? _timer;
+
 
   @override
   void initState() {
     super.initState();
     tz.initializeTimeZones();
     HiveFunctions.loadAlarms(ref);
-    _timer = Timer.periodic(const Duration(seconds: 1), _checkAlarms);
+    _timer = Timer.periodic(
+      const Duration(seconds: 1), // Checked every second
+      (timer) => AlarmFunctions.triggerAlarms(timer, ref),   // Main Alarm Function Call
+    );
   }
 
   @override
@@ -42,47 +43,13 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
     super.dispose();
   }
 
-  void _checkAlarms(Timer timer) {
-    final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
-
-    for (final alarm in alarms) {
-      // final isActive = ref.watch(AlarmStates.alarmSwitchProvider(index));
-      final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
-      if 
-      (!alarm.isRinging 
-      && alarm.selectedTime.hour == now.hour && alarm.selectedTime.minute == now.minute
-      && alarm.selectedTime.second == now.second && alarm.isActive == true) {
-        alarm.isRinging = true;
-        AlarmFunctions.playAlarmSound(alarm.ringtone);
-        NotificationController.showAlarmNotification();
-      }
-    }
-    ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms); // Trigger UI update
-  }
-
-  Future<void> _addAlarm() async {
-    print((DateTime.now().hour % 12));
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return AddAlarmScreen(
-          onTimezoneAdded: (String alarmTitle, String timezone, tz.TZDateTime selectedTime, String ringtone) async {
-             ref.read(AlarmStates.alarmsProvider.notifier).state = [
-              ...ref.read(AlarmStates.alarmsProvider),
-              AlarmItem(
-                id: DateTime.now().microsecondsSinceEpoch,
-                title: alarmTitle,
-                timezone: timezone, 
-                selectedTime: selectedTime,
-                ringtone: ringtone,
-                ),
-            ];
-            final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
-            HiveFunctions.saveAlarmList(alarmList);
-          },
-        );
-      },
-    );
+  fadeAndRemove(alarms, index, _controller) async {
+    print(alarms[index].title);
+    await _controller.forward(); // Trigger fade-out animation
+    await Future.delayed(
+      const Duration(milliseconds: 10),
+      () => AlarmFunctions.removeAlarm(ref, alarms, index),
+    ); // Wait for animation
   }
 
   @override
@@ -103,48 +70,79 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
       ),
       drawer: const DrawerContent(),
       // title: Text('Alarm List', style: ThemeConstants.notBoldText(context))),
-      body: ListView.builder(
-        itemCount: alarms.length,
-        itemBuilder: (context, index) {
-          final alarm = alarms[index];
-          return Dismissible(
-            key: Key(alarm.id.toString()), // Use a unique key for each alarm
-            onDismissed: (direction) {
-
-              if (alarms[index].isRinging) {
-                alarms[index].isRinging = false; // Stop the ringing state
-                AlarmFunctions.stopAlarm(alarms[index], ref); // Add a function to stop the sound
-              }
-
-              ref.read(AlarmStates.alarmsProvider.notifier).state = [
-                ...alarms..removeAt(index),
-              ];
-
-              final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
-              HiveFunctions.saveAlarmList(alarmList);
-            },
-            background: Container(
-              color: const Color.fromARGB(15, 172, 47, 38),
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.all(15.0),
+      body: alarms.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Transform.translate(
+                  offset: Offset(0, -20),
                   child: Text(
-                    "Delete",
-                    style: TextStyle(color: Color.fromARGB(255, 172, 47, 38), fontSize: 15),
+                    "Click on the + icon to add an alarm.",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      fontSize: ThemeConstants.getDynamicFontSize(26),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
+            )
+          : ListView.builder(
+              itemCount: alarms.length,
+              itemBuilder: (context, index) {
+                final alarm = alarms[index];
+                final _controller = AnimationController(
+                  duration: const Duration(milliseconds: 300), // Fade duration
+                  vsync: this,
+                );
+
+                return Dismissible(
+                  key: Key(alarm.id.toString()), // Use a unique key for each alarm
+                  onDismissed: (direction) => AlarmFunctions.removeAlarm(ref, alarms, index),
+                  background: Container(
+                    color: const Color.fromARGB(15, 172, 47, 38),
+                    child: const Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Text(
+                          "Delete",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 172, 47, 38),
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  child: FadeTransition(
+                    opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
+                      CurvedAnimation(
+                        parent: _controller,
+                        curve: Curves.easeOut,
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: () async {
+                        await AlarmFunctions.fireAlarm(alarm);
+                        if (alarm.deleteAfterRing == true) {
+                              AlarmFunctions.removeAlarm(
+                                  ref, alarms, alarms.indexOf(alarm));
+                              print("ALARM RANG ONCE AND WILL NOW BE REMOVED");
+                        } 
+                      }, 
+                      child: AlarmCard(
+                        ref: ref,
+                        alarm: alarm,
+                        index: index,
+                        showsubtimes: false,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-            child: AlarmCard(
-              ref: ref,
-              alarm: alarm,
-              index: index,
-              showsubtimes: false,
-            ),
-          );
-        },
-      ),
       floatingActionButton: Container(
         width: 70.0, // Diameter of the button
         height: 70.0,
@@ -160,7 +158,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> {
           ],
         ),
         child: IconButton(
-          onPressed: _addAlarm,
+          onPressed: () => AlarmFunctions.addAlarm(context, ref),
           icon: const Icon(Icons.add, size:35),
           // color: const Color.fromARGB(255, 55, 101, 187), // Icon color
           color: ThemeConstants.neutralblue,

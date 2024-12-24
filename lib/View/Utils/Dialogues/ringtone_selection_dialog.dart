@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 
@@ -15,6 +16,31 @@ class RingtoneSelectionDialog extends StatefulWidget {
 
 class _RingtoneSelectionDialogState extends State<RingtoneSelectionDialog> {
   int selectedIndex = 0; // Initial selected index is 0 (no ringtone selected)
+  late AudioPlayer player;
+
+  @override
+  void initState() {
+    super.initState();
+    player = AudioPlayer(); // Initialize the player
+  }
+
+  @override
+  void dispose() {
+    player.stop(); // Stop the sound when the dialog is disposed (closed)
+    player.dispose(); // Properly dispose the player
+    super.dispose();
+  }
+
+  // Play selected ringtone sound
+  Future<void> playAlarmSound(String path) async {
+    try {
+      await player.setAsset(path); // Set the ringtone asset
+      player.setLoopMode(LoopMode.off); // Ensure it plays only once
+      await player.play(); // Play the sound
+    } catch (e) {
+      print('Error playing alarm sound: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,47 +85,71 @@ class _RingtoneSelectionDialogState extends State<RingtoneSelectionDialog> {
                       ),
                     ),
                     SizedBox(
-                      height: 200, // Adjust height as needed
-                      child: ListView.builder(
-                        itemCount: ringtones.length,
-                        itemBuilder: (context, index) {
-                          final ringtone = ringtones[index];
-                          bool isSelected = selectedIndex == index;
-                          return SizedBox(
-                            height: 50,
-                            child: ListTile(
-                              leading: AnimatedOpacity(
-                                opacity: isSelected ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 300),
-                                child: const Icon(CupertinoIcons.check_mark, color: ThemeConstants.neutralblue),
+                      height: 300, // Adjust height as needed
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        radius: Radius.circular(15),
+                        child: ListView.builder(
+                          
+                          itemCount: ringtones.length + 1, // Add one more item for the extra space
+                          itemBuilder: (context, index) {
+                        
+                            // Space at the end of the list
+                            if (index == ringtones.length) return const SizedBox(height: 50); 
+                        
+                            final ringtone = ringtones[index];
+                            bool isSelected = selectedIndex == index;
+                            return SizedBox(
+                              height: 50,
+                              child: ListTile(
+                                leading: AnimatedOpacity(
+                                  opacity: isSelected ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: const Icon(CupertinoIcons.check_mark,
+                                      color: ThemeConstants.neutralblue),
+                                ),
+                                title: Text(
+                                  Ringtones.extractTitle(ringtone),
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                onTap: () async {
+                                  await player.stop();   // Stop previous sound before playing the new one
+                                  playAlarmSound(ringtone);
+                                  setState(() { // Update the selected index and trigger fade animation
+                                    selectedIndex = index;
+                                  });
+                                },
                               ),
-                              title: Text(
-                                Ringtones.extractTitle(ringtone),
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                              onTap: () {
-                                widget.onRingtoneSelected(ringtone); // Notify parent when ringtone is selected
-
-                                // Update the selected index and trigger fade animation
-                                setState(() {
-                                  selectedIndex = index;
-                                });
-
-                                Future.delayed(const Duration(milliseconds: 300), () => Navigator.pop(context, ringtone));
-                              },
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
+                    )
+
+                    // const SizedBox(height: 50),
                   ],
                 ),
                 Positioned(
                   right: 8,
                   top: 8,
                   child: IconButton(
+                    icon: const Icon(Icons.check),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      widget.onRingtoneSelected(ringtones[selectedIndex]); // Notify parent when ringtone is selected
+                      await player.stop();
+                    },
+                  ),
+                ),
+                Positioned(
+                  left: 8,
+                  top: 8,
+                  child: IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      player.stop(); // Stop the sound when closing the dialog
+                    },
                   ),
                 ),
               ],

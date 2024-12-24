@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:time_slider/Model/Models/ringtone_model.dart';
 import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
@@ -11,7 +13,7 @@ import 'package:time_slider/ViewModel/timefunctions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AddAlarmScreen extends StatefulWidget {
-  final void Function(String alarmTitle, String timezone, tz.TZDateTime selectedTime, String ringtone) onTimezoneAdded;
+  final void Function(String alarmTitle, String timezone, tz.TZDateTime selectedTime, Ringtone ringtone, bool deleteAfterRing ) onTimezoneAdded;
   const AddAlarmScreen({required this.onTimezoneAdded, super.key});
 
   @override
@@ -23,7 +25,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
   int selectedHourIndex = 0; // Index for hours (0 corresponds to 1)
   int selectedMinuteIndex = 0; // Index for minutes (0 corresponds to 00)
   bool vibratebool = false;
-  bool deletebool = false;
+  bool deleteAfterRing = false;
   String selectedTimezone = 'Asia/Karachi';
   bool isEmpty = false;
   bool noTitle = false;
@@ -44,7 +46,8 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
   }
 
   String remainingTimeText = "Alarm sets off in 0 hours, 0 minutes"; // Default text if no time is selected
-  String ringtoneTitle = "default ringtone";
+  String ringtonePath = Ringtones.defaultRingtone;
+  LoopMode ringtoneLoopMode = LoopMode.one;
   String alarmTitle = "";
 
 
@@ -94,11 +97,12 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                 IconButton(
                   onPressed: () {
                     tz.TZDateTime? selectedTime = _getSelectedTime();
+                    final ringtone = Ringtone(path: ringtonePath, loop: ringtoneLoopMode );
 
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
                     if (selectedTime != null && alarmTitle != "") {
-                      widget.onTimezoneAdded(alarmTitle, selectedTimezone, selectedTime, ringtoneTitle);
+                      widget.onTimezoneAdded(alarmTitle, selectedTimezone, selectedTime, ringtone, deleteAfterRing);
                       Navigator.pop(context);
                     } else {
                       setState(() {
@@ -218,14 +222,14 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                 ),
                 CustomListTile(
                   title: "Ringtone",
-                  subtitle: Ringtones.extractTitle(ringtoneTitle),
+                  subtitle:  Ringtones.extractTitle(ringtonePath),
                   onTap: () => showDialog(
                     context: context,
                     builder: (context) {
                       return RingtoneSelectionDialog(
                         onRingtoneSelected: (selectedRingtone) {
                           setState(() {
-                            ringtoneTitle = selectedRingtone;
+                            ringtonePath = selectedRingtone;
                           });
                           print("Selected Ringtone: $selectedRingtone");
                         },
@@ -233,9 +237,10 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     },
                   ),
                 ),
-                const CustomListTile(
+                CustomListTile(
                   title: "Repeat",
-                  subtitle: "Once",
+                  subtitle: ringtoneLoopMode == LoopMode.off ? "Once" : "Loop",
+                  onTapDown: (details) => showLoopModeMenu(details),
                 ),
                 CustomListTile(
                   title: "Vibrate on ring",
@@ -255,9 +260,9 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                   showDivider: false,
                   showChevron: false,
                   trailingWidget: Switch(
-                      value: deletebool,
+                      value: deleteAfterRing,
                       onChanged: (value) => setState(() {
-                            deletebool = value;
+                            deleteAfterRing = value;
                           })),
                 ),
               ],
@@ -267,6 +272,43 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
       ),
     );
   }
+
+void showLoopModeMenu(TapDownDetails details) {
+    showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+      details.globalPosition.dx, // Tap's X position
+      details.globalPosition.dy, // Tap's Y position
+      0, // Distance from the right edge of the screen
+      0, // Distance from the bottom edge of the screen
+    ),
+      items: [
+        const PopupMenuItem<String>(
+          value: "Once",
+          child: Text("Once"),
+        ),
+        const PopupMenuItem<String>(
+          value: "Loop",
+          child: Text("Loop"),
+        ),
+      ],
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          // Map the selected string to the corresponding LoopMode
+          if (value == "Once") {
+            ringtoneLoopMode = LoopMode.off;
+          } else if (value == "Loop") {
+            ringtoneLoopMode = LoopMode.one;
+          }
+        });
+
+        // Print the selected LoopMode
+        print(ringtoneLoopMode);
+      }
+    });
+  }
+  
 
   _editTitle(BuildContext context) {
   String newSubtitle = ""; // To store the input value

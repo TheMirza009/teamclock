@@ -20,7 +20,7 @@ void main() async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {
     await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
+  }                               
   runApp(const ProviderScope(child: MyApp()));
 }
 

@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';
+import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/Model/settings_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -92,6 +93,10 @@ class HiveFunctions {
         'title': alarm.title,
         'timezone': alarm.timezone,
         'selectedTime': alarm.selectedTime.toIso8601String(),
+        'ringtone': {
+          'path': alarm.ringtone.path,
+          'loop': alarm.ringtone.loop.index, // Save loop mode as an integer (index)
+        },
         'isRinging': alarm.isRinging,
         'isActive': alarm.isActive,
       };
@@ -101,7 +106,7 @@ class HiveFunctions {
     await saveData(key: 5, value: jsonEncode(jsonList));
       print("Alarms saved:");
     for ( var alarm in jsonList) {
-      print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}");
+      print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}, Alarm: ${Ringtones.extractTitle(alarm['ringtone']['path'])}");
     }
   }
 

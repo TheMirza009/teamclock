@@ -1,5 +1,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:time_slider/Model/Models/ringtone_model.dart';
+import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_card.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -10,8 +12,9 @@ class AlarmItem {
   final String title;
   final String timezone;
   final tz.TZDateTime selectedTime;
-  final String ringtone;
+  final Ringtone ringtone;
   bool isRinging;
+  bool deleteAfterRing;
   bool isActive;
 
   AlarmItem({
@@ -19,8 +22,9 @@ class AlarmItem {
     required this.title,
     required this.timezone,
     required this.selectedTime,
-    this.ringtone = 'Assets/sound/alarms/Basic Alarm.mp3',
+    this.ringtone = const Ringtone(),
     this.isRinging = false,
+    this.deleteAfterRing = false,
     this.isActive = true,
   });
 

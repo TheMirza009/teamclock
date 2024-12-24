@@ -224,7 +224,7 @@ class _AlarmCardState extends State<AlarmCard> {
                         ),
                         onPressed: () {
                           widget.alarm.isRinging = false; // Stop the ringing state
-                          AlarmFunctions.stopAlarm(widget.alarm, widget.ref); // Stop the sound
+                          AlarmFunctions.stopAlarm(widget.alarm); // Stop the sound
                         },
                         child: Text(
                           "Stop Alarm",

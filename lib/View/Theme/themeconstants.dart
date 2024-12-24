@@ -62,6 +62,7 @@ class ThemeConstants {
 
   // Neutral Color Themes
   static const neutralblue =  Color(0xFF5865F2);
+  static const neutraldeepblue =  Color.fromARGB(255, 55, 101, 187);
   static const neutralgrey = Color.fromARGB(64, 153, 163, 168);
   static const neutralgreen = Color(0xFF2E8F87);
   static const neutralred =  Color.fromARGB(255, 252, 87, 87);
@@ -97,6 +98,10 @@ class ThemeConstants {
         // FLOATING ACTION BUTTON STYLING
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.amber
+        ),
+
+        scrollbarTheme: ScrollbarThemeData(
+          thumbColor: MaterialStateProperty.all(darkTitle.withOpacity(0.2)), // 20% transparency of the primary color
         ),
 
         // ANDROID TIME PICKER THEME
@@ -145,6 +150,11 @@ class ThemeConstants {
         // floatingActionButtonTheme: FloatingActionButtonThemeData(
         //   backgroundColor: Colors.amber
         // ),
+
+        scrollbarTheme: ScrollbarThemeData(
+          thumbColor: MaterialStateProperty.all(lightTitle.withOpacity(0.2)), // 20% transparency of the primary color
+        ),
+
         sliderTheme: SliderThemeData(
           trackHeight: 1.0, // Hairline thickness
           activeTrackColor: const Color.fromARGB(166, 0, 0, 0),
