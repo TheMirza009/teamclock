@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:vibration/vibration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
@@ -14,33 +14,69 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart';
 
 class AlarmFunctions {
-
+  
   // Declarations
   static final AudioPlayer player = AudioPlayer();
+   static Timer? _vibrationTimer;
+
 
   // Stop Alarm
-  static void stopAlarm(AlarmItem alarm) async {
+  static void stopAlarm(WidgetRef ref, AlarmItem alarm) async {
     await player.stop();
+    await Vibration.cancel();
+    _vibrationTimer?.cancel();
     alarm.isRinging = false;
+    Future.delayed(const Duration(milliseconds: 300));
+    if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
   }
 
   // Play sound
-  static Future<void> playAlarmSound(AlarmItem alarm) async {
+  static Future<void> playAlarmSound(WidgetRef ref, AlarmItem alarm) async {
     try {
       await player.setAsset(alarm.ringtone.path);
       player.setLoopMode(alarm.ringtone.loop);
       await player.play();
       print("ALARM RANG ONCE AND WILL NOW BE REMOVED ========================================================= ");
-      stopAlarm(alarm);
+      stopAlarm(ref, alarm);
     } catch (e) {
       print('Error playing alarm sound: $e');
     }
   }
 
-  static Future<void> fireAlarm(AlarmItem alarm) async {
+  // Remove Alarm Function using AlarmItem directly
+  static void removeAlarm(WidgetRef ref, AlarmItem alarm) async {
+    // Access the alarms from the provider
+    final alarms = ref.read(AlarmStates.alarmsProvider);
+
+    // Stop the alarm sound if it's ringing
+    if (alarm.isRinging) {
+      alarm.isRinging = false; // Stop the ringing state
+      AlarmFunctions.stopAlarm(ref, alarm); // Stop the sound
+    }
+
+    // Remove the alarm from the list
+    alarms.removeWhere((existingAlarm) => existingAlarm.id == alarm.id);
+
+    // Update the provider and save the updated list
+    ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
+    HiveFunctions.saveAlarmList(alarms);
+  }
+
+  static Future<void> fireAlarm(WidgetRef ref, AlarmItem alarm) async {
     alarm.isRinging = true;
     NotificationController.showAlarmNotification();
-    AlarmFunctions.playAlarmSound(alarm);
+    AlarmFunctions.playAlarmSound(ref, alarm);
+    if (alarm.vibrateOnRing) {
+      _vibrationTimer = Timer.periodic(
+        const Duration(milliseconds: 1300),
+        (timer) async {
+          await Vibration.vibrate(
+            pattern: [500, 300, 500],
+            intensities: [128, 255, 128],
+          );
+        },
+      );
+    }
   }
 
   // Time difference function
@@ -84,28 +120,6 @@ class AlarmFunctions {
     return "$hours hours and $minutes minutes remain";
   }
 
-  // // Main Alarm Function
-  // static void triggerAlarms(Timer timer, WidgetRef ref) {
-  //   final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
-
-  //   for (final alarm in alarms) {
-  //     final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
-  //     if (!alarm.isRinging &&
-  //         alarm.selectedTime.hour == now.hour &&
-  //         alarm.selectedTime.minute == now.minute &&
-  //         alarm.selectedTime.second == now.second &&
-  //         alarm.isActive == true) {
-  //       alarm.isRinging = true;
-  //       NotificationController.showAlarmNotification();
-  //       AlarmFunctions.playAlarmSound(path: alarm.ringtone.path, loopMode: alarm.ringtone.loop);
-
-  //       if (alarm.deleteAfterRing == true) AlarmFunctions.removeAlarm(ref, alarms, 0);
-
-  //     }
-  //   }
-  //   ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms); // Trigger UI update
-  // }
-
   // Main Alarm Function
 static void triggerAlarms(Timer timer, WidgetRef ref) async {
   final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
@@ -119,26 +133,8 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
         alarm.selectedTime.minute == now.minute &&
         alarm.selectedTime.second == now.second &&
         alarm.isActive) {
-      await fireAlarm(alarm);
-      // if (alarm.deleteAfterRing == true) {
-      //   AlarmFunctions.removeAlarm(ref, alarms, alarms.indexOf(alarm));
-      //   print("ALARM RANG ONCE AND WILL NOW BE REMOVED");  
-      // };
+      await fireAlarm(ref, alarm);
     }
-
-
-
-    // // If the alarm is ringing, check if it should stop
-    // if (alarm.isRinging && alarm.ringtone.loop == LoopMode.off) {
-    //   // The alarm should automatically stop after ringing
-    //   // If the alarm hasn't stopped on its own, we can stop it here
-    //   // alarm.isRinging = false; // Mark as not ringing
-    //   // AlarmFunctions.stopAlarm(alarm); // Stop the sound if it hasn't stopped automatically
-    //   // Check if the alarm should be deleted after ringing
-    //   if (alarm.deleteAfterRing) {
-    //     AlarmFunctions.removeAlarm(ref, alarms, alarms.indexOf(alarm)); // Remove the alarm after stopping
-    //   }
-    // }
   }
 
   // Trigger UI update
@@ -153,16 +149,17 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
       context: context,
       builder: (context) {
         return AddAlarmScreen(
-          onTimezoneAdded: ( String alarmTitle, String timezone, tz.TZDateTime selectedTime, Ringtone ringtone, bool deleteAfterRing ) async {
+          onTimezoneAdded: (AlarmItem alarm) async {
             ref.read(AlarmStates.alarmsProvider.notifier).state = [
               ...ref.read(AlarmStates.alarmsProvider),
               AlarmItem(
-                id: DateTime.now().microsecondsSinceEpoch,
-                title: alarmTitle,
-                timezone: timezone,
-                selectedTime: selectedTime,
-                ringtone: ringtone,
-                deleteAfterRing: deleteAfterRing
+                id: alarm.id,
+                title: alarm.title,
+                timezone: alarm.timezone,
+                selectedTime: alarm.selectedTime,
+                ringtone: alarm.ringtone,
+                deleteAfterRing: alarm.deleteAfterRing,
+                vibrateOnRing: alarm.vibrateOnRing,
               ),
             ];
             final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
@@ -173,21 +170,14 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
     );
   }
 
-  // Remove Alarm Function
-  static void removeAlarm(WidgetRef ref, List<AlarmItem> alarms, int index,) {
+  static Future<void> vibrateOnRing() async {
+    // Check if the device can vibrate
+    bool? canVibrate = await Vibration.hasVibrator();
 
-    // Stop the alarm sound if it's ringing
-    if (alarms[index].isRinging) {
-      alarms[index].isRinging = false; // Stop the ringing state
-      AlarmFunctions.stopAlarm(alarms[index]); // Add a function to stop the sound
+    if (canVibrate == true) {
+      Vibration.vibrate(pattern: [500, 300, 500], intensities: [128, 255, 128]);
+    } else {
+      print("Device does not support vibration.");
     }
-
-    // Remove the alarm from the list and update the provider
-    alarms.removeAt(index);
-    ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
-
-    // Save the updated alarm list to Hive
-    final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
-    HiveFunctions.saveAlarmList(alarmList);
   }
 }

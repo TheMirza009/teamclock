@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
+import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/View/Drawer/drawer_content.dart';
@@ -14,6 +15,7 @@ import 'package:time_slider/View/Utils/drawerIcon.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:vibration/vibration.dart';
 
 class AlarmListScreen extends ConsumerStatefulWidget {
   const AlarmListScreen({super.key});
@@ -24,13 +26,14 @@ class AlarmListScreen extends ConsumerStatefulWidget {
 
 class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerProviderStateMixin  {
   Timer? _timer;
-
+  late AnimationController fadeController;
 
   @override
   void initState() {
     super.initState();
     tz.initializeTimeZones();
     HiveFunctions.loadAlarms(ref);
+
     _timer = Timer.periodic(
       const Duration(seconds: 1), // Checked every second
       (timer) => AlarmFunctions.triggerAlarms(timer, ref),   // Main Alarm Function Call
@@ -48,13 +51,15 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     await _controller.forward(); // Trigger fade-out animation
     await Future.delayed(
       const Duration(milliseconds: 10),
-      () => AlarmFunctions.removeAlarm(ref, alarms, index),
+      () => AlarmFunctions.removeAlarm(ref, index),
     ); // Wait for animation
   }
 
   @override
   Widget build(BuildContext context) {
     final alarms = ref.watch(AlarmStates.alarmsProvider);
+    ref.listen<List<AlarmItem>>(AlarmStates.alarmsProvider, (previous, next) {
+    });
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -92,14 +97,14 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
               itemCount: alarms.length,
               itemBuilder: (context, index) {
                 final alarm = alarms[index];
-                final _controller = AnimationController(
+                final fadeController = AnimationController(
                   duration: const Duration(milliseconds: 300), // Fade duration
                   vsync: this,
                 );
 
                 return Dismissible(
                   key: Key(alarm.id.toString()), // Use a unique key for each alarm
-                  onDismissed: (direction) => AlarmFunctions.removeAlarm(ref, alarms, index),
+                  onDismissed: (direction) => AlarmFunctions.removeAlarm(ref, alarm),
                   background: Container(
                     color: const Color.fromARGB(15, 172, 47, 38),
                     child: const Align(
@@ -119,24 +124,29 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                   child: FadeTransition(
                     opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
                       CurvedAnimation(
-                        parent: _controller,
+                        parent: fadeController,
                         curve: Curves.easeOut,
                       ),
                     ),
                     child: GestureDetector(
+                      onLongPress: () {
+                        
+                        Vibration.vibrate(pattern: [500, 300, 500], intensities: [128, 255, 128]);
+                        print("VIBRATE");
+                        },
                       onTap: () async {
-                        await AlarmFunctions.fireAlarm(alarm);
-                        if (alarm.deleteAfterRing == true) {
-                              AlarmFunctions.removeAlarm(
-                                  ref, alarms, alarms.indexOf(alarm));
-                              print("ALARM RANG ONCE AND WILL NOW BE REMOVED");
-                        } 
+                        AlarmFunctions.fireAlarm(ref, alarm);
                       }, 
                       child: AlarmCard(
                         ref: ref,
                         alarm: alarm,
                         index: index,
                         showsubtimes: false,
+                        stopAlarmFunction: () async {
+                          alarm.isRinging = false;
+                          if (alarm.deleteAfterRing) await fadeController.forward();
+                          AlarmFunctions.stopAlarm(ref, alarm);
+                          }
                       ),
                     ),
                   ),
@@ -152,8 +162,8 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3), // Shadow color with some transparency
-              blurRadius: 6, // The blur effect of the shadow
               offset: const Offset(-2, 4), // The offset of the shadow
+              blurRadius: 6, // The blur effect of the shadow
             ),
           ],
         ),

@@ -207,7 +207,7 @@ class NotificationController {
         if (receivedAction.buttonKeyPressed == "stopalarm") {
           final alarms = ref.watch(AlarmStates.alarmsProvider);
           print(receivedAction.title);
-          AlarmFunctions.stopAlarm(alarms[0]);
+          AlarmFunctions.stopAlarm(ref, alarms[0]);
         }
       },
     );

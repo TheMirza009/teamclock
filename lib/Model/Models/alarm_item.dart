@@ -15,6 +15,7 @@ class AlarmItem {
   final Ringtone ringtone;
   bool isRinging;
   bool deleteAfterRing;
+  bool vibrateOnRing;
   bool isActive;
 
   AlarmItem({
@@ -25,6 +26,7 @@ class AlarmItem {
     this.ringtone = const Ringtone(),
     this.isRinging = false,
     this.deleteAfterRing = false,
+    this.vibrateOnRing = false,
     this.isActive = true,
   });
 

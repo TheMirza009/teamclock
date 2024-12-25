@@ -17,6 +17,7 @@ class AlarmCard extends StatefulWidget {
   final AlarmItem alarm;
   final int index;
   final bool showsubtimes;
+  final VoidCallback  stopAlarmFunction;
 
   const AlarmCard({
     super.key,
@@ -24,6 +25,7 @@ class AlarmCard extends StatefulWidget {
     required this.ref,
     required this.index,
     required this.showsubtimes,
+    required this.stopAlarmFunction,
   });
 
   @override
@@ -217,20 +219,26 @@ class _AlarmCardState extends State<AlarmCard> {
                       );
                     },
                     child: widget.alarm.isRinging
-                    ? ElevatedButton(
-                        key: ValueKey(widget.alarm.isRinging), // Unique key for switching
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.surfaceBright,
-                        ),
-                        onPressed: () {
-                          widget.alarm.isRinging = false; // Stop the ringing state
-                          AlarmFunctions.stopAlarm(widget.alarm); // Stop the sound
-                        },
-                        child: Text(
-                          "Stop Alarm",
-                          style: GoogleFonts.montserrat(),
-                        ),
-                      )
+                    ? Consumer(
+                      builder: (context, ref, child) {
+                        return ElevatedButton(
+                          key: ValueKey(widget.alarm.isRinging), // Unique key for switching
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.surfaceBright,
+                          ),
+                          onPressed: widget.stopAlarmFunction,
+                          // () {
+                          //   widget.alarm.isRinging = false; // Stop the ringing state
+                          //   AlarmFunctions.stopAlarm(ref, widget.alarm); // Stop the sound
+                          // },
+                          child: Text(
+                            "Stop Alarm",
+                            style: GoogleFonts.montserrat(),
+                          ),
+                        );
+                      },
+                      
+                    )
                     : Consumer(
                         key: ValueKey(widget.alarm.isRinging), // Unique key for switching
                         builder: (context, ref, child) {

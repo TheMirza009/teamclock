@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/Models/ringtone_model.dart';
 import 'package:time_slider/Model/ringtones_class.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
@@ -13,7 +14,7 @@ import 'package:time_slider/ViewModel/timefunctions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AddAlarmScreen extends StatefulWidget {
-  final void Function(String alarmTitle, String timezone, tz.TZDateTime selectedTime, Ringtone ringtone, bool deleteAfterRing ) onTimezoneAdded;
+  final void Function(AlarmItem alarm) onTimezoneAdded;
   const AddAlarmScreen({required this.onTimezoneAdded, super.key});
 
   @override
@@ -24,7 +25,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
   int selectedAmPmIndex = 0; // 0 for AM, 1 for PM
   int selectedHourIndex = 0; // Index for hours (0 corresponds to 1)
   int selectedMinuteIndex = 0; // Index for minutes (0 corresponds to 00)
-  bool vibratebool = false;
+  bool vibrateOnRing = false;
   bool deleteAfterRing = false;
   String selectedTimezone = 'Asia/Karachi';
   bool isEmpty = false;
@@ -102,7 +103,16 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
                     if (selectedTime != null && alarmTitle != "") {
-                      widget.onTimezoneAdded(alarmTitle, selectedTimezone, selectedTime, ringtone, deleteAfterRing);
+                      AlarmItem newAlarm = AlarmItem(
+                        id: DateTime.now().microsecondsSinceEpoch,
+                        title: alarmTitle,
+                        timezone: selectedTimezone,
+                        selectedTime: selectedTime,
+                        ringtone: ringtone,
+                        deleteAfterRing: deleteAfterRing,
+                        vibrateOnRing: vibrateOnRing,
+                      );
+                      widget.onTimezoneAdded(newAlarm);
                       Navigator.pop(context);
                     } else {
                       setState(() {
@@ -247,10 +257,10 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                   subtitle: "",
                   showChevron: false,
                   trailingWidget: Switch(
-                    value: vibratebool,
+                    value: vibrateOnRing,
                     onChanged: (value) {
                       setState(() {
-                        vibratebool = value;
+                        vibrateOnRing = value;
                       });
                     }),
                 ),
