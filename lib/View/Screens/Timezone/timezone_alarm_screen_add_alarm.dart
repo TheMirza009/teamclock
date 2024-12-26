@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/Models/ringtone_model.dart';
 import 'package:time_slider/Model/ringtones_class.dart';
+import 'package:time_slider/Model/settings_states.dart';
 import 'package:time_slider/Model/timezone_states.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
@@ -35,7 +37,7 @@ AlarmItem _defaultAlarm = AlarmItem(
 );
 
 // MAIN CLASS
-class AddAlarmScreen extends StatefulWidget {
+class AddAlarmScreen extends ConsumerStatefulWidget {
   final void Function(AlarmItem alarm) onAlarmAdded;
   final AlarmItem? existingAlarm;
 
@@ -46,10 +48,10 @@ class AddAlarmScreen extends StatefulWidget {
   });
 
   @override
-  State<AddAlarmScreen> createState() => _AddAlarmScreenState();
+  ConsumerState<AddAlarmScreen> createState() => _AddAlarmScreenState();
 }
 
-class _AddAlarmScreenState extends State<AddAlarmScreen> {
+class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
   // DECLARATIONS
   late int selectedAmPmIndex; // 0 for AM, 1 for PM
@@ -163,6 +165,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool showing12HourFormat = ref.watch(SettingsStates.show12HourFormat);
     selectedTimezone = TimezoneStates.localTimezoneGlobal;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -195,7 +198,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
 
                     // Dynamically updated time
                     Text(
-                      AlarmFunctions.calculateTimeDifference(selectedTimezone, _getSelectedTime()!) ?? remainingTimeText,
+                      AlarmFunctions.calculateTimeDifference(selectedTimezone, _getSelectedTime()!, showing12HourFormat) ?? remainingTimeText,
                       style: const TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 10,
@@ -255,13 +258,12 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
 
                     // Hours Picker
                     _buildCupertinoPicker(
-                      itemCount: 12,
+                      itemCount: showing12HourFormat ? 12 : 24, // 12 for 12-hour, 24 for 24-hour
                       initialItem: selectedHourIndex,
                       onSelectedItemChanged: (index) => setState(() {
                         selectedHourIndex = index;
                       }),
-                      itemBuilder: (index) =>
-                          (index + 1).toString().padLeft(2, '0'),
+                      itemBuilder: (index) => (showing12HourFormat ? (index + 1) : index).toString().padLeft(2, '0'),
                     ),
 
                     // Minutes Picker
@@ -275,7 +277,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     ),
 
                     // AM/PM Picker
-                    _buildCupertinoPicker(
+                    showing12HourFormat ? _buildCupertinoPicker(
                       itemCount: 2,
                       initialItem: selectedAmPmIndex,
                       looping: false,
@@ -283,7 +285,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                         selectedAmPmIndex = index;
                       }),
                       itemBuilder: (index) => index == 0 ? "AM" : "PM",
-                    ),
+                    ) : const SizedBox.shrink(),
                   ],
                 ),
               ),

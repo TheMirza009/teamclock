@@ -82,45 +82,57 @@ class AlarmFunctions {
   }
 
   // Time difference function
-  static String calculateTimeDifference( String selectedTimezone, TZDateTime alarmSelectedTime) {
-    final deviceTime = DateTime.now();  // Get the current device time in UTC
+  static String calculateTimeDifference(
+  String selectedTimezone, 
+  TZDateTime alarmSelectedTime,
+  bool show12hourformat, // New parameter
+) {
+  final deviceTime = DateTime.now();  // Get the current device time in UTC
 
-    // Convert the current device time to the selected timezone
-    final currentTimeInSelectedTimezone = tz.TZDateTime.from(deviceTime, tz.getLocation(selectedTimezone));
+  // Convert the current device time to the selected timezone
+  final currentTimeInSelectedTimezone = tz.TZDateTime.from(deviceTime, tz.getLocation(selectedTimezone));
 
-    // Convert the alarmSelectedTime to the selected timezone
-    final alarmTimeInSelectedTimezone = tz.TZDateTime(
-      tz.getLocation(selectedTimezone),
-      currentTimeInSelectedTimezone.year,
-      currentTimeInSelectedTimezone.month,
-      currentTimeInSelectedTimezone.day,
-      alarmSelectedTime.hour,
-      alarmSelectedTime.minute,
-    );
+  // Convert the alarmSelectedTime to the selected timezone
+  final alarmTimeInSelectedTimezone = tz.TZDateTime(
+    tz.getLocation(selectedTimezone),
+    currentTimeInSelectedTimezone.year,
+    currentTimeInSelectedTimezone.month,
+    currentTimeInSelectedTimezone.day,
+    alarmSelectedTime.hour,
+    alarmSelectedTime.minute,
+  );
 
-    // If the alarm time is earlier than the current time, move it to the next day
-    var adjustedAlarmTime = alarmTimeInSelectedTimezone;
-    if (alarmTimeInSelectedTimezone.isBefore(currentTimeInSelectedTimezone)) {
-      adjustedAlarmTime = alarmTimeInSelectedTimezone.add(const Duration(days: 1));
-    }
+  // If the alarm time is earlier than the current time, move it to the next day
+  var adjustedAlarmTime = alarmTimeInSelectedTimezone;
+  if (alarmTimeInSelectedTimezone.isBefore(currentTimeInSelectedTimezone)) {
+    adjustedAlarmTime = alarmTimeInSelectedTimezone.add(const Duration(days: 1));
+  }
 
-    // Calculate the difference between the adjusted alarm time and current time
-    final difference = adjustedAlarmTime.difference(currentTimeInSelectedTimezone);
+  // Calculate the difference between the adjusted alarm time and current time
+  final difference = adjustedAlarmTime.difference(currentTimeInSelectedTimezone);
 
-    // Check if the time remaining is less than a minute
-    if (difference.inSeconds < 60 && difference.inSeconds > 0) {
-      return "${difference.inSeconds} seconds remain";
-    }
+  // Check if the time remaining is less than a minute
+  if (difference.inSeconds < 60 && difference.inSeconds > 0) {
+    return "${difference.inSeconds} seconds remain";
+  }
 
-    if (difference.inSeconds == 0 && difference.inMinutes == 0 ) return "Alarm Ringing!";
+  if (difference.inSeconds == 0 && difference.inMinutes == 0 ) return "Alarm Ringing!";
 
-    // Extract hours and minutes
-    final hours = difference.inHours;
-    final minutes = difference.inMinutes % 60;
+  // Extract hours and minutes
+  final hours = difference.inHours;
+  final minutes = difference.inMinutes % 60;
 
-    // Return the appropriate string
+  // Determine whether to use 12-hour or 24-hour format
+  if (show12hourformat) {
+    final amPm = hours >= 12 ? 'PM' : 'AM';
+    final hourIn12HourFormat = hours % 12 == 0 ? 12 : hours % 12;
+    return "$hours hours and $minutes minutes remain";
+  } else {
+    // Return the time in 24-hour format
     return "$hours hours and $minutes minutes remain";
   }
+}
+
 
   // Main Alarm Function
 static void triggerAlarms(Timer timer, WidgetRef ref) async {

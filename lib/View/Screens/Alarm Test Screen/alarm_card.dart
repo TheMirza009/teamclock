@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/alarm_states.dart';
+import 'package:time_slider/Model/settings_states.dart';
 import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
@@ -12,6 +13,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class AlarmCard extends StatefulWidget {
+
   // Temporarily made into stateful
   final WidgetRef ref;
   final AlarmItem alarm;
@@ -35,10 +37,12 @@ class AlarmCard extends StatefulWidget {
 class _AlarmCardState extends State<AlarmCard> {
   @override
   Widget build(BuildContext context) {
+
+    bool showing12HourFormat = widget.ref.watch(SettingsStates.show12HourFormat);
     int selectedhour = widget.alarm.selectedTime.hour;
     final now = tz.TZDateTime.now(tz.getLocation(widget.alarm.timezone));
     final timeLeft = widget.alarm.timeLeft(now);
-    final hour = TimezoneFunctions.formatHourOnly(widget.alarm.selectedTime, true);
+    final hour = TimezoneFunctions.formatHourOnly(widget.alarm.selectedTime, showing12HourFormat);
     bool past12 = selectedhour >= 12;
     String ampm = past12 ? "PM" : "AM";
     bool isLightMode = Theme.of(context).brightness == Brightness.light;
@@ -118,15 +122,15 @@ class _AlarmCardState extends State<AlarmCard> {
                               fontSize: 28, fontWeight: FontWeight.w600)),
                         Column(
                           children: [
-                            Icon(past12 ? CupertinoIcons.moon_stars : CupertinoIcons.sun_haze, size: 15, color: widget.alarm.isActive ? primaryColor : disabledPrimaryColor),
-                            Text(ampm, style: GoogleFonts.montserrat(
+                            Icon(past12 ? CupertinoIcons.moon_stars : CupertinoIcons.sun_haze, size: showing12HourFormat ? 15 : 18, color: widget.alarm.isActive ? primaryColor : disabledPrimaryColor),
+                            showing12HourFormat ? Text(ampm, style: GoogleFonts.montserrat(
                               color: widget.alarm.isActive 
                               ? primaryColor 
                               : disabledPrimaryColor, 
                               fontSize: 12, 
                               fontWeight: FontWeight.w600,
                               ),
-                            ),
+                            ) : SizedBox.shrink(),
                           ],
                         ),
                       ],
@@ -186,7 +190,7 @@ class _AlarmCardState extends State<AlarmCard> {
                             ),
                             Text(
                               widget.alarm.isRinging ? "Alarm Ringing!" :
-                              AlarmFunctions.calculateTimeDifference(widget.alarm.timezone, widget.alarm.selectedTime),
+                              AlarmFunctions.calculateTimeDifference(widget.alarm.timezone, widget.alarm.selectedTime, showing12HourFormat),
                                 style: GoogleFonts.montserrat(
                                     fontSize: 8, 
                                     fontWeight: FontWeight.w500, 
