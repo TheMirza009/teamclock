@@ -12,7 +12,7 @@ import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Pomodoro%20Dialogues/tuning_dialogue_ios.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Segmented%20Control/pomodoro_segmented_control.dart';
 import 'package:time_slider/ViewModel/pomodoro_functions.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 
 class PomodoroMainRiverpod extends ConsumerStatefulWidget {
@@ -113,7 +113,7 @@ Widget build(BuildContext context) {
             GestureDetector(
               onTap: () => PomodoroFunctions.testReset(ref, context),
               child: Text(
-                TimeFunctions.formatTimeFromSeconds(timerValue),
+                TimezoneFunctions.formatTimeFromSeconds(timerValue),
                 style: timerValue >= 3600
                     ? themeContext.textTheme.titleMedium
                     : themeContext.textTheme.titleLarge,

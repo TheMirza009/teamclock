@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_slider/View/Utils/Animations/slide_fade_transition.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class StopwatchState {
   final Duration elapsed;
@@ -82,9 +82,9 @@ class StopwatchNotifier extends StateNotifier<StopwatchState> {
           animation: animation,
           child: ListTile(
             title: Text("Lap ${i + 1}"),
-            subtitle: Text(TimeFunctions.formatDuration(state.laps[i])),
+            subtitle: Text(TimezoneFunctions.formatDuration(state.laps[i])),
             trailing: Text(
-              TimeFunctions.formatTimeFromDateTime(DateTime.now()),
+              TimezoneFunctions.formatTimeFromDateTime(DateTime.now()),
               style: TextStyle(color: Colors.red[900]),
             ),
           ),

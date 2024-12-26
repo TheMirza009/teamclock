@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/Model/timezone_states.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class AddTimezoneDialog extends StatefulWidget {
+  final bool? addingAlarm;
   final ValueChanged<String> onTimezoneAdded; // Callback to notify parent screen
 
-  const AddTimezoneDialog({super.key, required this.onTimezoneAdded});
+  const AddTimezoneDialog({
+    super.key, 
+    required this.onTimezoneAdded,
+    this.addingAlarm = false,
+    });
 
   @override
   State<AddTimezoneDialog> createState() => _AddTimezoneDialogState();
@@ -42,8 +47,8 @@ class _AddTimezoneDialogState extends State<AddTimezoneDialog> {
         filteredTimeZones = tz.timeZoneDatabase.locations.keys.toList();
       } else {
         filteredTimeZones = tz.timeZoneDatabase.locations.keys.where((timeZone) {
-          String cityAndCountry = TimeFunctions.replaceLongWords(TimeFunctions.getCityAndCountryFromTimezone(timeZone).toLowerCase());
-          String offset = TimeFunctions.getTimezoneOffset(timeZone).trim(); // Trim offset for consistency
+          String cityAndCountry = TimezoneFunctions.replaceLongWords(TimezoneFunctions.getCityAndCountryFromTimezone(timeZone).toLowerCase());
+          String offset = TimezoneFunctions.getTimezoneOffset(timeZone).trim(); // Trim offset for consistency
           String offsetWithoutGMT = offset.replaceAll('GMT', '').trim();
 
           // Check if either the timezone, city and country, or offset matches the search query
@@ -103,9 +108,9 @@ class _AddTimezoneDialogState extends State<AddTimezoneDialog> {
                         itemCount: filteredTimeZones.length,
                         itemBuilder: (context, index) {
                           final currentItem = filteredTimeZones[index];
-                          bool isAlreadyAdded = TimezoneStates.timezoneselections.contains(currentItem);
-                          String location = TimeFunctions.replaceLongWords(TimeFunctions.getCityAndCountryFromTimezone(currentItem));
-                          String offset = TimeFunctions.getTimezoneOffset(currentItem);
+                          bool isAlreadyAdded = TimezoneStates.timezoneselections.contains(currentItem) && !widget.addingAlarm!;
+                          String location = TimezoneFunctions.replaceLongWords(TimezoneFunctions.getCityAndCountryFromTimezone(currentItem));
+                          String offset = TimezoneFunctions.getTimezoneOffset(currentItem);
                           return ListTile(
                             enabled: !isAlreadyAdded,
                             title: Row(

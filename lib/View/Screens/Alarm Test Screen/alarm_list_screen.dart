@@ -94,14 +94,19 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
               ),
             )
           : ListView.builder(
-              itemCount: alarms.length,
+              itemCount: alarms.length + 1, // + 1 for handling last item
               itemBuilder: (context, index) {
+
+                // Scrollable space at the end
+                if (index == alarms.length) return const SizedBox(height: 200); 
+
                 final alarm = alarms[index];
                 final fadeController = AnimationController(
                   duration: const Duration(milliseconds: 300), // Fade duration
                   vsync: this,
                 );
 
+                // Main Alarm Tile
                 return Dismissible(
                   key: Key(alarm.id.toString()), // Use a unique key for each alarm
                   onDismissed: (direction) => AlarmFunctions.removeAlarm(ref, alarm),
@@ -130,8 +135,9 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                     ),
                     child: GestureDetector(
                       onLongPress: () {
-                        
-                        Vibration.vibrate(pattern: [500, 300, 500], intensities: [128, 255, 128]);
+                        AlarmFunctions.editAlarm(context, ref, alarm);
+                        // Vibration.vibrate(pattern: [500, 300, 500], intensities: [128, 255, 128]);
+                        Vibration.vibrate(pattern: [100], intensities: [128]);
                         print("VIBRATE");
                         },
                       onTap: () async {

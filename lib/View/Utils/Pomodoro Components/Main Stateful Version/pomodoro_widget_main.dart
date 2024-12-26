@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_countdown_widget.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Segmented%20Control/pomodoro_segmented_control.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_button_row.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:time_slider/Model/pomodoro_states.dart';  // Import your provider file
 
 class PomodoroWidget extends StatefulWidget {
@@ -59,7 +59,7 @@ class _PomodoroWidgetState extends State<PomodoroWidget> {
                 InkWell(
                   onTap: () {
                     // Handle any reset logic or tap actions here
-                    print(TimeFunctions.formatTimeFromSeconds(
+                    print(TimezoneFunctions.formatTimeFromSeconds(
                         countdownKey.currentState!.countdownNotifier.value));
                   },
                   child: Padding(

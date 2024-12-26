@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_slider/View/Utils/TimeZone%20components/currenttimegetter.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class TimeZoneWidget extends StatefulWidget {
   final String timezone;
@@ -66,7 +66,7 @@ class _TimeZoneWidgetState extends State<TimeZoneWidget> {
                   ],
                 ),
             Text(
-                  TimeFunctions.formatCounter(counter),
+                  TimezoneFunctions.formatCounter(counter),
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
           ],

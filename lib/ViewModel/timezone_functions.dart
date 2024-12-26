@@ -7,7 +7,7 @@ import 'package:time_slider/View/Utils/TimeZone%20components/fadingcolon.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-class TimeFunctions {
+class TimezoneFunctions {
 
   static String formatTimeOnly({
     required tz.TZDateTime current,

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_slider/Model/hive_class.dart';
 import 'package:time_slider/Model/settings_states.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -53,8 +53,8 @@ class _TimeZoneMainUIState extends ConsumerState<TimeZoneMainUI> {
   Widget build(BuildContext context) {
     if (ref.watch(SettingsStates.showSeconds))  _startTimer();
     final currentTime = tz.TZDateTime.now(tz.getLocation(widget.selectedTimeZone)).add(Duration(minutes: widget.initialCounter));
-    final formattedDate = TimeFunctions.formatDate(currentTime);
-    final formattedTime = TimeFunctions.formatTime(
+    final formattedDate = TimezoneFunctions.formatDate(currentTime);
+    final formattedTime = TimezoneFunctions.formatTime(
       current: currentTime, 
       context: context, 
       showSeconds: ref.watch(SettingsStates.showSeconds), 
@@ -62,10 +62,10 @@ class _TimeZoneMainUIState extends ConsumerState<TimeZoneMainUI> {
       );
     final dayOfWeek = formattedDate['dayOfWeek']; // Correctly access the key
     final fullDate = formattedDate['fullDate']; // Correctly access the key
-    final location = TimeFunctions.getCityAndCountryFromTimezone(widget.selectedTimeZone);
-    final offset = TimeFunctions.getTimezoneOffset(widget.selectedTimeZone);
-    final currentDay = (TimeFunctions.formatDate(tz.TZDateTime.now(tz.getLocation(widget.selectedTimeZone))))['dayOfWeek'];
-    final nextday = (TimeFunctions.formatDate(
+    final location = TimezoneFunctions.getCityAndCountryFromTimezone(widget.selectedTimeZone);
+    final offset = TimezoneFunctions.getTimezoneOffset(widget.selectedTimeZone);
+    final currentDay = (TimezoneFunctions.formatDate(tz.TZDateTime.now(tz.getLocation(widget.selectedTimeZone))))['dayOfWeek'];
+    final nextday = (TimezoneFunctions.formatDate(
       tz.TZDateTime.now(tz.getLocation(widget.selectedTimeZone))
       .add(const Duration(hours: 24))))['dayOfWeek'];
 
@@ -199,7 +199,7 @@ class _TimeZoneMainUIState extends ConsumerState<TimeZoneMainUI> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8),
           child: Text(
-            TimeFunctions.formatCounter(widget.initialCounter),
+            TimezoneFunctions.formatCounter(widget.initialCounter),
             style: Theme.of(context).textTheme.displayMedium,
           ),
         ),

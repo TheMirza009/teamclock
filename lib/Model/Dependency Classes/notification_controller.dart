@@ -114,7 +114,7 @@ class NotificationController {
     print("Triggering Alarm...");
     AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: 1,
+        id: 10,
         channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
         title: 'Alarm',
         body: "Currently ringing!",

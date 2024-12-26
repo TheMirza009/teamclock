@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AddTimezoneDialogTest extends StatefulWidget {
@@ -21,7 +21,7 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
   @override
   Widget build(BuildContext context) {
     final timezones = tz.timeZoneDatabase.locations.keys.toList();
-    final now = TimeFunctions.formatTimeOnly(
+    final now = TimezoneFunctions.formatTimeOnly(
       show12HourFormat: true,
       context: context, 
       current: tz.TZDateTime.now(tz.getLocation(selectedTimezone)),

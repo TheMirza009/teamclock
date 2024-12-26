@@ -1,93 +1,201 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:time_slider/Model/Models/alarm_item.dart';
 import 'package:time_slider/Model/Models/ringtone_model.dart';
 import 'package:time_slider/Model/ringtones_class.dart';
+import 'package:time_slider/Model/timezone_states.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/View/Utils/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
 import 'package:time_slider/View/Utils/Dialogues/ringtone_selection_dialog.dart';
 import 'package:time_slider/View/Utils/custom_list_tile.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+// DEFAULT VALUES DECLARATIONS
+final _currentTime = tz.TZDateTime.now(tz.getLocation(TimezoneStates.localTimezoneGlobal));
+
+AlarmItem _defaultAlarm = AlarmItem(
+  id: DateTime.now().microsecondsSinceEpoch,
+  selectedTime: _currentTime,
+  timezone: TimezoneStates.localTimezoneGlobal,
+  title: "",
+  vibrateOnRing: false,
+  deleteAfterRing: false,
+  isActive: true,
+  isRinging: false,
+  ringtone: const Ringtone(
+    path: Ringtones.defaultRingtone,
+    loop: LoopMode.one,
+  ),
+);
+
+// MAIN CLASS
 class AddAlarmScreen extends StatefulWidget {
-  final void Function(AlarmItem alarm) onTimezoneAdded;
-  const AddAlarmScreen({required this.onTimezoneAdded, super.key});
+  final void Function(AlarmItem alarm) onAlarmAdded;
+  final AlarmItem? existingAlarm;
+
+  const AddAlarmScreen({
+    required this.onAlarmAdded,
+    this.existingAlarm,
+    super.key,
+  });
 
   @override
   State<AddAlarmScreen> createState() => _AddAlarmScreenState();
 }
 
 class _AddAlarmScreenState extends State<AddAlarmScreen> {
-  int selectedAmPmIndex = 0; // 0 for AM, 1 for PM
-  int selectedHourIndex = 0; // Index for hours (0 corresponds to 1)
-  int selectedMinuteIndex = 0; // Index for minutes (0 corresponds to 00)
-  bool vibrateOnRing = false;
-  bool deleteAfterRing = false;
-  String selectedTimezone = 'Asia/Karachi';
+
+  // DECLARATIONS
+  late int selectedAmPmIndex; // 0 for AM, 1 for PM
+  late int selectedHourIndex;
+  late int selectedMinuteIndex;
+  late bool vibrateOnRing;
+  late bool deleteAfterRing;
+  late String selectedTimezone;
+  late String ringtonePath;
+  late LoopMode ringtoneLoopMode;
+  late String alarmTitle;
+
+  bool showError = false;
   bool isEmpty = false;
   bool noTitle = false;
+  String remainingTimeText = "Alarm sets off in 0 hours, 0 minutes"; // Default text if no time is selected
 
-  tz.TZDateTime? _getSelectedTime() {
-    // Get the current time zone
-    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    print("LOCAL LOCATION: ${tz.local}");
-
-    // Calculate the selected time based on the pickers
-    int selectedHour = selectedHourIndex + 1; // Adding 1 as index starts from 0
-    if (selectedAmPmIndex == 1) { // PM
-      selectedHour += 12; // Convert PM hours to 24-hour format
-    }
-
-    // Set the selected time using the chosen hour and minute
-    return tz.TZDateTime(tz.local, now.year, now.month, now.day, selectedHour, selectedMinuteIndex);
+  // INIT STATE
+  @override
+  void initState() {
+    super.initState();
+    initializeValues();
   }
 
-  String remainingTimeText = "Alarm sets off in 0 hours, 0 minutes"; // Default text if no time is selected
-  String ringtonePath = Ringtones.defaultRingtone;
-  LoopMode ringtoneLoopMode = LoopMode.one;
-  String alarmTitle = "";
+  // FUNCTIONS
+  void initializeValues() {
 
+    // Initialize _defaultAlarm with runtime data
+    final currentTime = tz.TZDateTime.now(tz.getLocation(TimezoneStates.localTimezoneGlobal));
+
+    // Use the current time to create the default alarm
+    _defaultAlarm = AlarmItem(
+      id: currentTime.microsecondsSinceEpoch,
+      selectedTime: currentTime,
+      timezone: TimezoneStates.localTimezoneGlobal,
+      title: "",
+      vibrateOnRing: false,
+      deleteAfterRing: false,
+      isActive: true,
+      isRinging: false,
+      ringtone: const Ringtone(
+        path: Ringtones.defaultRingtone,
+        loop: LoopMode.one,
+      ),
+    );
+
+    // Determine the alarm to use, either from widget or default
+    final alarm = widget.existingAlarm ?? _defaultAlarm;
+
+    // Initialize state variables from the selected alarm
+    selectedAmPmIndex = alarm.selectedTime.hour >= 12 ? 1 : 0; // PM if hour >= 12
+    selectedHourIndex = (alarm.selectedTime.hour % 12) == 0  ? 11 : (alarm.selectedTime.hour % 12) - 1; // 0-indexed for picker
+    selectedMinuteIndex = alarm.selectedTime.minute;
+    vibrateOnRing = alarm.vibrateOnRing;
+    deleteAfterRing = alarm.deleteAfterRing;
+    selectedTimezone = alarm.timezone;
+    ringtonePath = alarm.ringtone.path;
+    ringtoneLoopMode = alarm.ringtone.loop;
+    alarmTitle = alarm.title;
+  }
+
+  // Get selected Time from CUPERTINO PICKERS
+  tz.TZDateTime? _getSelectedTime() {
+    final now = tz.TZDateTime.now(tz.local);  // Use the local timezone
+    int selectedHour = (selectedHourIndex + 1) % 12 + (selectedAmPmIndex == 1 ? 12 : 0); // Adjust for AM/PM
+    return tz.TZDateTime(
+      tz.local,  // Use dynamic timezone
+      now.year,
+      now.month,
+      now.day,
+      selectedHour,
+      selectedMinuteIndex,
+    );
+  }
+
+  // Function to set initial time values based on the current local time
+  void setInitialTimeValues() {
+    tz.TZDateTime currentTimeLocal = tz.TZDateTime.now(tz.getLocation(selectedTimezone));
+    int hour = currentTimeLocal.hour % 12; // Convert to 12-hour format
+    selectedAmPmIndex = currentTimeLocal.hour >= 12 ? 1 : 0; // 0 for AM, 1 for PM
+    selectedHourIndex = hour == 0 ? 11 : hour - 1; // Index for hour (0 corresponds to 1)
+    selectedMinuteIndex = currentTimeLocal.minute; // Index for minutes (0 corresponds to 00)
+  }
+
+  Widget _buildCupertinoPicker({
+    required int itemCount,
+    required int initialItem,
+    required ValueChanged<int> onSelectedItemChanged,
+    required String Function(int index) itemBuilder,
+    bool looping = true,
+  }) {
+    final displayMedium = GoogleFonts.robotoMono(fontWeight: FontWeight.w300, fontSize: 22);
+    return Expanded(
+      child: CupertinoPicker(
+        looping: looping,
+        itemExtent: 60,
+        scrollController: FixedExtentScrollController(initialItem: initialItem),
+        onSelectedItemChanged: onSelectedItemChanged,
+        children: List.generate(
+          itemCount,
+          (index) => Center(
+            child: Text(
+              itemBuilder(index),
+              style: displayMedium,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = Theme.of(context).colorScheme.primary;
-    final displayMedium = GoogleFonts.robotoMono(fontWeight: FontWeight.w300, fontSize: 22);
-
-    // if (selectedTime != null) {
-    //   final duration = selectedTime!.difference(tz.TZDateTime.now(tz.local));
-    //   int hours = duration.inHours;
-    //   int minutes = duration.inMinutes % 60;
-
-    //   remainingTimeText = "Alarm sets off in $hours hours, $minutes minutes";
-    // }
-
+    selectedTimezone = TimezoneStates.localTimezoneGlobal;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+
             // TOP SECTION
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+
+                // CLOSE Button
                 IconButton(
                   icon: const Icon(Icons.close, size: 30),
                   onPressed: () => Navigator.pop(context),
                 ),
                 Column(
                   children: [
-                    const Text(
-                      "Add Alarm",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+
+                    // Screen Title 
+                    GestureDetector(
+                      onTap: () => print(_currentTime.hour),
+                      child: Text(
+                        widget.existingAlarm == null ? "Add Alarm" : "Edit Alarm",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
                     ),
+
+                    // Dynamically updated time
                     Text(
-                      AlarmFunctions.calculateTimeDifference(selectedTimezone, _getSelectedTime()!) ?? remainingTimeText, // Dynamically updated text
+                      AlarmFunctions.calculateTimeDifference(selectedTimezone, _getSelectedTime()!) ?? remainingTimeText,
                       style: const TextStyle(
                         fontWeight: FontWeight.normal,
                         fontSize: 10,
@@ -95,8 +203,12 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     ),
                   ],
                 ),
+
+                // CONFIRM Button
                 IconButton(
                   onPressed: () {
+
+                    // Main alarm add function
                     tz.TZDateTime? selectedTime = _getSelectedTime();
                     final ringtone = Ringtone(path: ringtonePath, loop: ringtoneLoopMode );
 
@@ -112,7 +224,7 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                         deleteAfterRing: deleteAfterRing,
                         vibrateOnRing: vibrateOnRing,
                       );
-                      widget.onTimezoneAdded(newAlarm);
+                      widget.onAlarmAdded(newAlarm);
                       Navigator.pop(context);
                     } else {
                       setState(() {
@@ -131,9 +243,10 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
               ],
             ),
 
-            // Cupertino picker
+            // Cupertino pickers
             Padding(
-              padding: const EdgeInsets.only(top: 15.0, bottom: 15, left: 30, right: 15),
+              padding: const EdgeInsets.only(
+                  top: 15.0, bottom: 15, left: 30, right: 15),
               child: SizedBox(
                 height: 300,
                 child: Row(
@@ -141,64 +254,35 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                   children: [
 
                     // Hours Picker
-                    Expanded(
-                      child: CupertinoPicker(
-                        looping: true,
-                        itemExtent: 60,
-                        scrollController: FixedExtentScrollController(
-                          // initialItem: tz.TZDateTime.now(tz.getLocation(selectedTimezone)).hour, // Convert 24-hour to 12-hour format
-                          // initialItem: (DateTime.now().hour % 12), // Convert 24-hour to 12-hour format
-                          // initialItem: tz.TZDateTime.now(tz.getLocation(selectedTimezone)).hour, // Convert 24-hour to 12-hour format
-                        ),
-                        onSelectedItemChanged: (index) {
-                          setState(() {
-                            selectedHourIndex = index;
-                          });
-                        },
-                        children: List.generate(
-                          12,
-                          (index) => Center(
-                            child: Text(
-                              (index + 1).toString().padLeft(2, '0'),
-                              style: displayMedium,
-                            ),
-                          ),
-                        ),
-                      ),
+                    _buildCupertinoPicker(
+                      itemCount: 12,
+                      initialItem: selectedHourIndex,
+                      onSelectedItemChanged: (index) => setState(() {
+                        selectedHourIndex = index;
+                      }),
+                      itemBuilder: (index) =>
+                          (index + 1).toString().padLeft(2, '0'),
                     ),
 
                     // Minutes Picker
-                    Expanded(
-                      child: CupertinoPicker(
-                        looping: true,
-                        itemExtent: 60,
-                        onSelectedItemChanged: (index) {
-                          setState(() {
-                            selectedMinuteIndex = index;
-                          });
-                        },
-                        children: List.generate(
-                          60,
-                          (index) => Center(
-                              child: Text(index.toString().padLeft(2, '0'), style: displayMedium)),
-                        ),
-                      ),
+                    _buildCupertinoPicker(
+                      itemCount: 60,
+                      initialItem: selectedMinuteIndex,
+                      onSelectedItemChanged: (index) => setState(() {
+                        selectedMinuteIndex = index;
+                      }),
+                      itemBuilder: (index) => index.toString().padLeft(2, '0'),
                     ),
 
                     // AM/PM Picker
-                    Expanded(
-                      child: CupertinoPicker(
-                        itemExtent: 60,
-                        onSelectedItemChanged: (index) {
-                          setState(() {
-                            selectedAmPmIndex = index;
-                          });
-                        },
-                        children: [
-                          Center(child: Text("AM", style: displayMedium)),
-                          Center(child: Text("PM", style: displayMedium)),
-                        ],
-                      ),
+                    _buildCupertinoPicker(
+                      itemCount: 2,
+                      initialItem: selectedAmPmIndex,
+                      looping: false,
+                      onSelectedItemChanged: (index) => setState(() {
+                        selectedAmPmIndex = index;
+                      }),
+                      itemBuilder: (index) => index == 0 ? "AM" : "PM",
                     ),
                   ],
                 ),
@@ -210,19 +294,24 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
             // OPTIONS COLUMN
             Column(
               children: [
+
+                // TITLE Option
                 CustomListTile(
                   title: "Title",
                   subtitle: noTitle ? "The title cannot be empty."  : alarmTitle,
                   noTitle: noTitle,
                   onTap: () => _editTitle(context),
                 ),
+
+                // TIMEZONE Option
                 CustomListTile(
                   title: "Timezone",
-                  subtitle: TimeFunctions.getCityAndCountryFromTimezone(selectedTimezone),
+                  subtitle: TimezoneFunctions.getCityAndCountryFromTimezone(selectedTimezone),
                   onTap: () => showDialog(
                     context: context,
                     builder: (context) {
                       return AddTimezoneDialog(
+                        addingAlarm: true,
                         onTimezoneAdded: (timezone) {
                           setState(() => selectedTimezone = timezone);
                         },
@@ -230,6 +319,8 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     },
                   ),
                 ),
+
+                // RINGTONE Option
                 CustomListTile(
                   title: "Ringtone",
                   subtitle:  Ringtones.extractTitle(ringtonePath),
@@ -247,11 +338,15 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                     },
                   ),
                 ),
+
+                // REPEAT Menu
                 CustomListTile(
                   title: "Repeat",
                   subtitle: ringtoneLoopMode == LoopMode.off ? "Once" : "Loop",
                   onTapDown: (details) => showLoopModeMenu(details),
                 ),
+
+                // VIBRATE option
                 CustomListTile(
                   title: "Vibrate on ring",
                   subtitle: "",
@@ -264,16 +359,19 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
                       });
                     }),
                 ),
+
+                // DELETE option
                 CustomListTile(
                   title: "Delete after ring",
                   subtitle: "",
                   showDivider: false,
                   showChevron: false,
                   trailingWidget: Switch(
-                      value: deleteAfterRing,
-                      onChanged: (value) => setState(() {
-                            deleteAfterRing = value;
-                          })),
+                    value: deleteAfterRing,
+                    onChanged: (value) => 
+                      setState(() => deleteAfterRing = value
+                        ),
+                  ),
                 ),
               ],
             )
@@ -283,15 +381,16 @@ class _AddAlarmScreenState extends State<AddAlarmScreen> {
     );
   }
 
-void showLoopModeMenu(TapDownDetails details) {
+  // DIALOGUES for options
+  void showLoopModeMenu(TapDownDetails details) {
     showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
-      details.globalPosition.dx, // Tap's X position
-      details.globalPosition.dy, // Tap's Y position
-      0, // Distance from the right edge of the screen
-      0, // Distance from the bottom edge of the screen
-    ),
+        details.globalPosition.dx, // Tap's X position
+        details.globalPosition.dy, // Tap's Y position
+        0, // Distance from the right edge of the screen
+        0, // Distance from the bottom edge of the screen
+      ),
       items: [
         const PopupMenuItem<String>(
           value: "Once",
@@ -318,86 +417,86 @@ void showLoopModeMenu(TapDownDetails details) {
       }
     });
   }
-  
 
+  // EDIT title
   _editTitle(BuildContext context) {
-  String newSubtitle = ""; // To store the input value
-  final formKey = GlobalKey<FormState>(); // Key for validation
+    String newSubtitle = ""; // To store the input value
+    final formKey = GlobalKey<FormState>(); // Key for validation
 
-  showCupertinoDialog(
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return CupertinoAlertDialog(
-            title: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Title"),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(), // Close dialog
-                  icon: const Icon(
-                    CupertinoIcons.xmark,
-                    size: 24,
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return CupertinoAlertDialog(
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Title"),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(), // Close dialog
+                    icon: const Icon(
+                      CupertinoIcons.xmark,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+              content: Material(
+                color: Colors
+                    .transparent, // Allows the TextFormField to render properly
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          labelText: "Enter new Title",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Title cannot be empty";
+                          }
+                          return null;
+                        },
+                        onChanged: (value) {
+                          newSubtitle = value.trim();
+                        },
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            content: Material(
-              color: Colors.transparent, // Allows the TextFormField to render properly
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        labelText: "Enter new Title",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return "Title cannot be empty";
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        newSubtitle = value.trim();
-                      },
-                    ),
-                  ],
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  isDestructiveAction: true,
+                  child: const Text("Cancel"),
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                isDestructiveAction: true,
-                child: const Text("Cancel"),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              CupertinoDialogAction(
-                child: const Text("Confirm"),
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    // Update the parent state with the new subtitle
-                    this.setState(() {
-                      alarmTitle = newSubtitle.trim();
-                      noTitle = false;
-                    });
-                    Navigator.of(context).pop();
-                  }
-                },
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
-
+                CupertinoDialogAction(
+                  child: const Text("Confirm"),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      // Update the parent state with the new subtitle
+                      this.setState(() {
+                        alarmTitle = newSubtitle.trim();
+                        noTitle = false;
+                      });
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }

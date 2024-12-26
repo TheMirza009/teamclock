@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class TimeZoneDisplay extends StatelessWidget {
   final String timeZone;
@@ -25,8 +25,8 @@ class TimeZoneDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final current = tz.TZDateTime.now(tz.getLocation(timeZone)).add(Duration(minutes: dynamicMinutes));
-    final location = TimeFunctions.getCityAndCountryFromTimezone(timeZone);
-    final offset = TimeFunctions.getTimezoneOffset(timeZone);
+    final location = TimezoneFunctions.getCityAndCountryFromTimezone(timeZone);
+    final offset = TimezoneFunctions.getTimezoneOffset(timeZone);
 
     return isMini ? _buildMiniWidget(context, current, location, offset) : _buildFullWidget(context, current, location, offset);
   }

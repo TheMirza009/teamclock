@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,7 @@ class AlarmFunctions {
     alarm.isRinging = false;
     Future.delayed(const Duration(milliseconds: 300));
     if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
+    AwesomeNotifications().cancel(10);
   }
 
   // Play sound
@@ -149,7 +151,7 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
       context: context,
       builder: (context) {
         return AddAlarmScreen(
-          onTimezoneAdded: (AlarmItem alarm) async {
+          onAlarmAdded: (AlarmItem alarm) async {
             ref.read(AlarmStates.alarmsProvider.notifier).state = [
               ...ref.read(AlarmStates.alarmsProvider),
               AlarmItem(
@@ -169,6 +171,44 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
       },
     );
   }
+
+  // Add Alarm Function
+  static Future<void> editAlarm(BuildContext context, WidgetRef ref, AlarmItem existingAlarm) async {
+    print((DateTime.now().hour % 12));
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return AddAlarmScreen(
+          existingAlarm: existingAlarm,
+          onAlarmAdded: (AlarmItem newAlarm) async {
+
+            // REPLACE ALARM LOGIC
+            ref.read(AlarmStates.alarmsProvider.notifier).update((alarms) {
+              final index = alarms.indexWhere((alarm) => alarm.id == existingAlarm.id);
+              if (index != -1) { alarms[index] = newAlarm; }
+              return List.of(alarms); // Return a new list for state update
+            });
+
+            final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
+            HiveFunctions.saveAlarmList(alarmList);
+          },
+        );
+      },
+    );
+  }
+
+  // External Replace Alarm Function
+  // call => replaceAlarm(ref, existingAlarm.id, newAlarm);
+  static void replaceAlarm(WidgetRef ref, int existingAlarmID, AlarmItem newAlarm) {
+    ref.read(AlarmStates.alarmsProvider.notifier).update((alarms) {
+      final index = alarms.indexWhere((alarm) => alarm.id == existingAlarmID);
+      if (index != -1) {
+        alarms[index] = newAlarm;
+      }
+      return List.of(alarms); // Return a new list for state update
+    });
+  }
+
 
   static Future<void> vibrateOnRing() async {
     // Check if the device can vibrate

@@ -6,7 +6,7 @@ import 'package:time_slider/View/Utils/Animations/slide_fade_transition.dart';
 import 'package:time_slider/View/Utils/drawerIcon.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/Model/Provider%20Classes/stopwatch_provider_class.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class StopwatchScreen extends StatelessWidget {
   const StopwatchScreen({super.key});
@@ -38,7 +38,7 @@ class StopwatchScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    TimeFunctions.formatDuration(stopwatchState.elapsed),
+                    TimezoneFunctions.formatDuration(stopwatchState.elapsed),
                     style: ThemeConstants.robotoMono,
                   ),
                 ),
@@ -65,8 +65,8 @@ class StopwatchScreen extends StatelessWidget {
                             animation: animation,
                             child: ListTile(
                               title: Text("Lap ${index + 1}"),
-                              subtitle: Text(TimeFunctions.formatDuration(stopwatchState.laps[index])),
-                              trailing: Text(TimeFunctions.formatTimeFromDateTime(DateTime.now()),
+                              subtitle: Text(TimezoneFunctions.formatDuration(stopwatchState.laps[index])),
+                              trailing: Text(TimezoneFunctions.formatTimeFromDateTime(DateTime.now()),
                               ),
                             ),
                           );

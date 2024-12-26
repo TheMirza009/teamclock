@@ -7,7 +7,7 @@ import 'package:time_slider/View/Utils/Dialogues/Pomodoro%20Dialogues/new_task_d
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Segmented%20Control/pomodoro_task_tab_control.dart';
 import 'package:time_slider/View/Utils/Pomodoro%20Components/Task%20Section/pomodoro_task_item.dart';
 import 'package:time_slider/ViewModel/pomodoro_functions.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class PomodoroTaskList extends ConsumerWidget {
   const PomodoroTaskList({super.key});
@@ -75,7 +75,7 @@ Widget build(BuildContext context, WidgetRef ref) {    // Watch the providers to
                       final task = entry.value;
                       final itemText = task['text'];
                       final itemValue = task['value'];
-                      final itemTime = TimeFunctions.formatTimeFromDateTime(task['time']) ?? "00:00AM";
+                      final itemTime = TimezoneFunctions.formatTimeFromDateTime(task['time']) ?? "00:00AM";
           
                       return TaskItem(
                         text: itemText,

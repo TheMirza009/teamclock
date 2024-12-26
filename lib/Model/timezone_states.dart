@@ -3,6 +3,7 @@ import 'package:time_slider/Model/hive_class.dart';
 
 class TimezoneStates {
   static bool isLoading = false;
+  static String localTimezoneGlobal = "UTC";
   static String selectedTimeZone = "UTC";
   static List<String> timezoneselections = [];
 
@@ -11,6 +12,7 @@ class TimezoneStates {
     String localTimezone = await FlutterTimezone.getLocalTimezone();
     if (!timezoneselections.contains(localTimezone)) timezoneselections.add(localTimezone);
     selectedTimeZone = localTimezone;
+    TimezoneStates.localTimezoneGlobal = localTimezone;
     await HiveFunctions.saveTimeZones(selectedTimeZone: selectedTimeZone, timezoneList: timezoneselections);
   }
 }

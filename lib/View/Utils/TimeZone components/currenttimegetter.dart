@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -26,8 +26,8 @@ Widget timeAndPlaceFromTimeZone({
 
    // Get the current time in that timezone
   final current = tz.TZDateTime.now(tz.getLocation(timezone)).add(Duration(minutes: dynamicMinutes));
-  final location = TimeFunctions.getCityAndCountryFromTimezone(timezone); // Location Names for display
-  final offset = TimeFunctions.getTimezoneOffset(timezone); // GMT Offset for display
+  final location = TimezoneFunctions.getCityAndCountryFromTimezone(timezone); // Location Names for display
+  final offset = TimezoneFunctions.getTimezoneOffset(timezone); // GMT Offset for display
 
   // Styling
   bool isLightTheme = Theme.of(context).colorScheme.primary != ThemeConstants.darkTitle;

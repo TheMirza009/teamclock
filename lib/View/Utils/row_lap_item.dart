@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:time_slider/Model/Provider%20Classes/stopwatch_provider_class.dart';
 import 'package:time_slider/View/Utils/Animations/slide_fade_transition.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 
 class RowLap extends ConsumerWidget {
   const RowLap({super.key});
@@ -34,7 +34,7 @@ class RowLap extends ConsumerWidget {
                   ),
 
                   // ACTUAL LAP TIME : CENTER
-                  Text(TimeFunctions.formatDuration(stopwatchState.laps[index]),
+                  Text(TimezoneFunctions.formatDuration(stopwatchState.laps[index]),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class RowLap extends ConsumerWidget {
 
                   // CURRENT TIME : TRAILING
                   Text(
-                    TimeFunctions.formatTimeFromDateTime(DateTime.now()),
+                    TimezoneFunctions.formatTimeFromDateTime(DateTime.now()),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],

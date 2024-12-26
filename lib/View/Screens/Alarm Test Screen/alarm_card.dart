@@ -7,7 +7,7 @@ import 'package:time_slider/Model/alarm_states.dart';
 import 'package:time_slider/View/Screens/Alarm%20Test%20Screen/alarm_list_screen.dart';
 import 'package:time_slider/View/Theme/themeconstants.dart';
 import 'package:time_slider/ViewModel/alarm_functions.dart';
-import 'package:time_slider/ViewModel/timefunctions.dart';
+import 'package:time_slider/ViewModel/timezone_functions.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -38,7 +38,7 @@ class _AlarmCardState extends State<AlarmCard> {
     int selectedhour = widget.alarm.selectedTime.hour;
     final now = tz.TZDateTime.now(tz.getLocation(widget.alarm.timezone));
     final timeLeft = widget.alarm.timeLeft(now);
-    final hour = TimeFunctions.formatHourOnly(widget.alarm.selectedTime, true);
+    final hour = TimezoneFunctions.formatHourOnly(widget.alarm.selectedTime, true);
     bool past12 = selectedhour >= 12;
     String ampm = past12 ? "PM" : "AM";
     bool isLightMode = Theme.of(context).brightness == Brightness.light;
@@ -144,7 +144,7 @@ class _AlarmCardState extends State<AlarmCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(TimeFunctions.getCityAndCountryFromTimezone(widget.alarm.timezone),
+                          Text(TimezoneFunctions.getCityAndCountryFromTimezone(widget.alarm.timezone),
                               style: GoogleFonts.montserrat(
                                 color: widget.alarm.isActive ? primaryColor : disabledPrimaryColor,
                                   fontSize: 12, fontWeight: widget.showsubtimes ? FontWeight.w700 : FontWeight.normal,
