@@ -2,11 +2,11 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:time_slider/Model/Dependency%20Classes/notification_controller.dart';
-import 'package:time_slider/Model/Provider%20Classes/theme_class.dart';
-import 'package:time_slider/Model/hive_class.dart';
-import 'package:time_slider/View/Screens/Timezone/timezone_screen.dart';
-import 'package:time_slider/View/Theme/themeconstants.dart';
+import 'package:time_slider/core/base/controllers/notification_controller.dart';
+import 'package:time_slider/core/theme/theme_provider_class.dart';
+import 'package:time_slider/core/base/controllers/hive_class.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
+import 'package:time_slider/core/theme/theme_constants.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
