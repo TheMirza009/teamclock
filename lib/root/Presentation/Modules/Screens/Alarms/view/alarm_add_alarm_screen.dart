@@ -220,7 +220,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                     if (selectedTime != null) {
                       AlarmItem newAlarm = AlarmItem(
                         id: DateTime.now().microsecondsSinceEpoch,
-                        title: alarmTitle != "" ? "Alarm" : alarmTitle,
+                        title: alarmTitle == "" ? "Alarm" : alarmTitle,
                         timezone: selectedTimezone,
                         selectedTime: selectedTime,
                         ringtone: ringtone,

@@ -26,7 +26,7 @@ class AlarmFunctions {
     await Vibration.cancel();
     _vibrationTimer?.cancel();
     alarm.isRinging = false;
-    Future.delayed(const Duration(milliseconds: 300));
+    // Future.delayed(const Duration(milliseconds: 300));
     if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
     AwesomeNotifications().cancel(10);
   }
@@ -78,6 +78,7 @@ class AlarmFunctions {
     }
   }
 
+  // FIRE ALARM FUNCTION
   static Future<void> fireAlarm(WidgetRef ref, AlarmItem alarm) async {
     alarm.isRinging = true;
     NotificationController.showAlarmNotification(alarm);

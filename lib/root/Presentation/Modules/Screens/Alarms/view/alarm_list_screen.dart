@@ -36,15 +36,21 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     tz.initializeTimeZones();
     HiveFunctions.loadAlarms(ref);
 
+    fadeController = AnimationController(
+      duration: const Duration(milliseconds: 300), // Adjust duration as needed
+      vsync: this,
+    );
+
     _timer = Timer.periodic(
       const Duration(seconds: 1), // Checked every second
       (timer) => AlarmFunctions.triggerAlarms(timer, ref),   // Main Alarm Function Call
     );
   }
 
-  @override
+@override
   void dispose() {
     _timer?.cancel();
+    fadeController.dispose(); // Dispose of the controller to free resources
     super.dispose();
   }
 
@@ -77,7 +83,9 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
             title: "Clear Alarms",
             content: "Are you sure you want to clear all alarms?",
             onYesPressed: () async {
+              await fadeController.forward();
               await AlarmFunctions.clearAlarms(ref);
+              fadeController.reset();
               },
           ),
           icon: svgIcon(color: primaryColor),
@@ -118,8 +126,10 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                 if (index == alarms.length) return const SizedBox(height: 200); 
 
                 final alarm = alarms[index];
-                final fadeController = AnimationController(
-                  duration: const Duration(milliseconds: 300), // Fade duration
+
+                final singleFadeController = AnimationController(
+                  duration: const Duration(
+                      milliseconds: 300), // Adjust duration as needed
                   vsync: this,
                 );
 
@@ -146,7 +156,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                   child: FadeTransition(
                     opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
                       CurvedAnimation(
-                        parent: fadeController,
+                        parent: alarm.deleteAfterRing ? singleFadeController : fadeController,
                         curve: Curves.easeOut,
                       ),
                     ),
@@ -167,8 +177,9 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         showsubtimes: false,
                         stopAlarmFunction: () async {
                           alarm.isRinging = false;
-                          if (alarm.deleteAfterRing) await fadeController.forward();
+                          if (alarm.deleteAfterRing) await singleFadeController.forward();
                           AlarmFunctions.stopAlarm(ref, alarm);
+                          singleFadeController.reset(); 
                           }
                       ),
                     ),
@@ -176,27 +187,6 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                 );
               },
             ),
-      floatingActionButton: Container(
-        width: 70.0, // Diameter of the button
-        height: 70.0,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3), // Shadow color with some transparency
-              offset: const Offset(-2, 4), // The offset of the shadow
-              blurRadius: 6, // The blur effect of the shadow
-            ),
-          ],
-        ),
-        child: IconButton(
-          onPressed: () => AlarmFunctions.addAlarm(context, ref),
-          icon: const Icon(Icons.add, size:35),
-          // color: const Color.fromARGB(255, 55, 101, 187), // Icon color
-          color: ThemeConstants.neutralblue,
-        ),
-      ),
     );
   }
 }
