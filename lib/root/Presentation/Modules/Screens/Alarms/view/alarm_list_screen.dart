@@ -36,18 +36,20 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     tz.initializeTimeZones();
     HiveFunctions.loadAlarms(ref);
 
+    // Fade Controller for total dismissal
     fadeController = AnimationController(
       duration: const Duration(milliseconds: 300), // Adjust duration as needed
       vsync: this,
     );
 
+    // Timer checks every second for alarm condition
     _timer = Timer.periodic(
       const Duration(seconds: 1), // Checked every second
-      (timer) => AlarmFunctions.triggerAlarms(timer, ref),   // Main Alarm Function Call
+      (timer) => AlarmFunctions.triggerAlarms(timer, ref),  // Main Alarm Function Call
     );
   }
 
-@override
+  @override
   void dispose() {
     _timer?.cancel();
     fadeController.dispose(); // Dispose of the controller to free resources
@@ -69,6 +71,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     ref.listen<List<AlarmItem>>(AlarmStates.alarmsProvider, (previous, next) {
     });
 
+    // Color declarations
     final themeContext = Theme.of(context);
     final primaryColor = themeContext.colorScheme.primary;
 
@@ -78,28 +81,27 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
       centerTitle: true,
       title: ThemeConstants.pageTitle(context, "Alarms"), 
       leading: IconButton(
-          onPressed: () => cupertinoSimpleDialogue(
-            context: context,
-            title: "Clear Alarms",
-            content: "Are you sure you want to clear all alarms?",
-            onYesPressed: () async {
-              await fadeController.forward();
-              await AlarmFunctions.clearAlarms(ref);
-              fadeController.reset();
-              },
+        onPressed: () => cupertinoSimpleDialogue(
+          context: context,
+          title: "Clear Alarms",
+          content: "Are you sure you want to clear all alarms?",
+          onYesPressed: () async {
+            await fadeController.forward();
+            await AlarmFunctions.clearAlarms(ref);
+            fadeController.reset();
+            },
           ),
           icon: svgIcon(color: primaryColor),
         ),
-      actions: 
-      [
-        IconButton(
+        actions: [
+          IconButton(
             onPressed: () => AlarmFunctions.addAlarm(context, ref),
             icon: Icon(CupertinoIcons.add, color: primaryColor),
           ),
-      ],
+        ],
       ),
-      drawer: const DrawerContent(),
       // title: Text('Alarm List', style: ThemeConstants.notBoldText(context))),
+      drawer: const DrawerContent(),
       body: alarms.isEmpty
           ? Center(
               child: Padding(
@@ -125,13 +127,14 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                 // Scrollable space at the end
                 if (index == alarms.length) return const SizedBox(height: 200); 
 
-                final alarm = alarms[index];
-
+                // Animation controller for auto-dismissal
                 final singleFadeController = AnimationController(
-                  duration: const Duration(
-                      milliseconds: 300), // Adjust duration as needed
+                  duration: const Duration(milliseconds: 300), // Adjust duration as needed
                   vsync: this,
                 );
+
+                // Current Alarm item
+                final alarm = alarms[index];
 
                 // Main Alarm Tile
                 return Dismissible(
@@ -153,6 +156,8 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                       ),
                     ),
                   ),
+
+                  // Fade setting
                   child: FadeTransition(
                     opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
                       CurvedAnimation(
@@ -160,16 +165,19 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         curve: Curves.easeOut,
                       ),
                     ),
+
+                    // Test Section
                     child: GestureDetector(
                       onLongPress: () {
                         AlarmFunctions.editAlarm(context, ref, alarm);
-                        // Vibration.vibrate(pattern: [500, 300, 500], intensities: [128, 255, 128]);
                         Vibration.vibrate(pattern: [100], intensities: [128]);
                         print("VIBRATE");
-                        },
+                      },
                       onTap: () async {
                         AlarmFunctions.fireAlarm(ref, alarm);
                       }, 
+
+                      // Main ALARM CARD UI
                       child: AlarmCard(
                         ref: ref,
                         alarm: alarm,
