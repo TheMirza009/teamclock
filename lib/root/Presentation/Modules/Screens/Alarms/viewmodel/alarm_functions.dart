@@ -21,7 +21,7 @@ class AlarmFunctions {
    static Timer? _vibrationTimer;
 
   // Stop Alarm
-  static void stopAlarm(WidgetRef ref, AlarmItem alarm) async {
+  static Future<void> stopAlarm(WidgetRef ref, AlarmItem alarm) async {
     await player.stop();
     await Vibration.cancel();
     _vibrationTimer?.cancel();

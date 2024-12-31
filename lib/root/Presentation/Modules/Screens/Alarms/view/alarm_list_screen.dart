@@ -29,12 +29,13 @@ class AlarmListScreen extends ConsumerStatefulWidget {
 class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerProviderStateMixin  {
   Timer? _timer;
   late AnimationController fadeController;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     tz.initializeTimeZones();
-    HiveFunctions.loadAlarms(ref);
+    _initializeAlarms();
 
     // Fade Controller for total dismissal
     fadeController = AnimationController(
@@ -56,9 +57,21 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     super.dispose();
   }
 
-  fadeAndRemove(alarms, index, _controller) async {
+  Future<void> _initializeAlarms() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await HiveFunctions.loadAlarms(ref);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  fadeAndRemove(alarms, index, controller) async {
     print(alarms[index].title);
-    await _controller.forward(); // Trigger fade-out animation
+    await controller.forward(); // Trigger fade-out animation
     await Future.delayed(
       const Duration(milliseconds: 10),
       () => AlarmFunctions.removeAlarm(ref, index),
@@ -102,12 +115,20 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
       ),
       // title: Text('Alarm List', style: ThemeConstants.notBoldText(context))),
       drawer: const DrawerContent(),
-      body: alarms.isEmpty
+      body: 
+      isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                // color: themeContext.colorScheme.onSecondary,
+                color: ThemeConstants.neutralblue,
+              ),
+            )
+          : alarms.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(30.0),
                 child: Transform.translate(
-                  offset: Offset(0, -20),
+                  offset: const Offset(0, -20),
                   child: Text(
                     "Click on the + icon to add an alarm.",
                     textAlign: TextAlign.center,
@@ -186,7 +207,8 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         stopAlarmFunction: () async {
                           alarm.isRinging = false;
                           if (alarm.deleteAfterRing) await singleFadeController.forward();
-                          AlarmFunctions.stopAlarm(ref, alarm);
+                          await AlarmFunctions.stopAlarm(ref, alarm);
+                          await Future.delayed(const Duration(milliseconds: 400)); 
                           singleFadeController.reset(); 
                           }
                       ),
