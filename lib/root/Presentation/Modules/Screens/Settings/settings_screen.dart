@@ -89,15 +89,17 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
         backgroundColor: surfaceColor,
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: Colors.transparent,
-          title: Text(
-            "Settings",
-            style: GoogleFonts.montserrat(
-              color: primaryColor,
-              fontWeight: FontWeight.w600,
-              fontSize: ThemeConstants.getDynamicFontSize(20),
-            ),
-          ),
+          title: ThemeConstants.pageTitle(context, "Settings"),
+          // Text(
+          //   "Settings",
+          //   style: GoogleFonts.montserrat(
+          //     color: primaryColor,
+          //     fontWeight: FontWeight.w600,
+          //     fontSize: ThemeConstants.getDynamicFontSize(20),
+          //   ),
+          // ),
         ),
         body: Column(
           children: [

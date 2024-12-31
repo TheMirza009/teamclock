@@ -63,9 +63,24 @@ class AlarmFunctions {
     HiveFunctions.saveAlarmList(alarms);
   }
 
+  // Clear Alarms
+  static Future<void> clearAlarms(WidgetRef ref) async {
+    final alarms = ref.read(
+        AlarmStates.alarmsProvider); // Access the alarms from the provider
+
+    // Ensure that at least one alarm exists before trying to clear others
+    if (alarms.isNotEmpty) {
+      alarms.clear();
+
+      // Update the provider and save the updated list
+      ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
+      await HiveFunctions.saveAlarmList(alarms);
+    }
+  }
+
   static Future<void> fireAlarm(WidgetRef ref, AlarmItem alarm) async {
     alarm.isRinging = true;
-    NotificationController.showAlarmNotification();
+    NotificationController.showAlarmNotification(alarm);
     AlarmFunctions.playAlarmSound(ref, alarm);
     if (alarm.vibrateOnRing) {
       _vibrationTimer = Timer.periodic(

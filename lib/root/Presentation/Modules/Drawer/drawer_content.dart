@@ -4,7 +4,6 @@ import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_
 import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Stopwatch/stopwatch_screen.dart';
 import 'package:time_slider/core/theme/theme_constants.dart';
 
 class DrawerContent extends StatelessWidget {
@@ -37,6 +36,8 @@ class DrawerContent extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           SizedBox(height: ThemeConstants.getDynamicFontSize(70)),
+
+          // Timezones tile
           ListTile(
             leading: const Icon(Icons.access_time),
             title: Text('Timezones', style: Theme.of(context).textTheme.displayMedium),
@@ -44,6 +45,8 @@ class DrawerContent extends StatelessWidget {
               Navigator.pop(context);
               navigation(context, const TimezonesScreen());},
           ),
+
+          // Pomodoro tile
           ListTile(
             leading: const Icon(CupertinoIcons.timelapse),
             title: Text('Pomodoro', style: Theme.of(context).textTheme.displayMedium),
@@ -52,14 +55,8 @@ class DrawerContent extends StatelessWidget {
               navigation(context, const PomodoroScreen());
             },
           ),
-          ListTile(
-            leading: const Icon(CupertinoIcons.stopwatch),
-            title: Text('Stopwatch', style: Theme.of(context).textTheme.displayMedium),
-            onTap: () { 
-              Navigator.pop(context);
-              navigation(context, StopwatchScreen());
-              },
-          ),
+
+          // Alarms Tile
           ListTile(
             leading: const Icon(CupertinoIcons.alarm),
             title: Text('Alarms', style: Theme.of(context).textTheme.displayMedium),
@@ -69,6 +66,8 @@ class DrawerContent extends StatelessWidget {
               // navigation(context, const AlarmScreen());
               },
           ),
+
+          // Settings tile
           ListTile(
             leading: const Icon(CupertinoIcons.gear),
             title: Text('Settings', style: Theme.of(context).textTheme.displayMedium),

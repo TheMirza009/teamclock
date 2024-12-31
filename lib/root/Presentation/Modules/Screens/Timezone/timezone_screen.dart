@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:time_slider/core/base/controllers/hive_class.dart';
@@ -8,11 +9,13 @@ import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel
 import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
 import 'package:time_slider/root/Presentation/Widgets/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
+import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
 import 'package:time_slider/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
 import 'package:time_slider/root/Presentation/Modules/Drawer/drawerIcon.dart';
 import 'package:time_slider/root/Presentation/Widgets/TimeZone%20components/timezone_ui.dart';
 import 'package:time_slider/root/Presentation/Widgets/TimeZone%20components/timezoneminiwidget.dart';
 import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:time_slider/root/Presentation/Widgets/svgIcon.dart';
 
 class TimezonesScreen extends StatefulWidget {
   const TimezonesScreen({
@@ -23,14 +26,40 @@ class TimezonesScreen extends StatefulWidget {
   State<TimezonesScreen> createState() => _TimezonesScreenState();
 }
 
-class _TimezonesScreenState extends State<TimezonesScreen> {
+class _TimezonesScreenState extends State<TimezonesScreen>  with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
   int counter = 0;
   bool isLoading = true;
+
+
   @override
   void initState() {
     super.initState();
     _initializeTimezone();
     _initializeHive();
+
+    // Animation initialization
+    // Initialize the AnimationController
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    // Define the slide animation (swipe to the left)
+    _slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(-1.0, 0.0), // Slide to the left
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+    @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeTimezone() async {
@@ -81,6 +110,32 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
     );
   }
 
+  void clearAllTimezones() async {
+    await _animationController.forward();
+    if (TimezoneStates.timezoneselections.isNotEmpty) {
+      final String firstElement = TimezoneStates.timezoneselections.first;
+
+      setState(() {
+        // Retain only the first element
+        TimezoneStates.timezoneselections
+          ..clear()
+          ..add(firstElement);
+      });
+
+      // Save the updated time zones list
+      await HiveFunctions.saveTimeZones(
+        selectedTimeZone: TimezoneStates.selectedTimeZone,
+        timezoneList: TimezoneStates.timezoneselections,
+      );
+    } else {
+      debugPrint("No timezones to clear.");
+    }
+
+    // Reset the animation after it completes
+      _animationController.reset();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     final themeContext = Theme.of(context);
@@ -90,23 +145,25 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
     return Scaffold(
       appBar: AppBar(
         title:ThemeConstants.pageTitle(context, "Timezones"),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
-        leading: buildDrawerIconButton(context),
+        leading: IconButton(
+          onPressed: () => cupertinoSimpleDialogue(
+            context: context,
+            title: "Clear Timezones",
+            content: "Are you sure you want to clear all timezones?",
+            onYesPressed: () async {
+              clearAllTimezones();
+              },
+          ),
+          icon: svgIcon(color: primaryColor),
+        ),
+
         actions: [
           IconButton(
-            onPressed: () => Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (_) => const AlarmListScreen(),
-            // builder: (_) => const AlarmScreen(),
+            onPressed: _addTimeZone,
+            icon: Icon(CupertinoIcons.add, color: primaryColor),
           ),
-        ),
-            icon: Icon( CupertinoIcons.alarm, color: primaryColor),
-          ),
-          // IconButton(
-          //   onPressed: () => _showThemeSelectionDialog(context),
-          //   icon: Icon( isDark ? Icons.dark_mode : Icons.light_mode, color: primaryColor),
-          // ),
         ],
       ),
       drawer: const DrawerContent(),
@@ -152,32 +209,36 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
                   HiveFunctions.saveData(key: 2, value: counter);
                 },
               ),
-              // const FadingWidget(
-              //   child: Text("RISE"),
-              // ),
+              
               // This Column is dependent on States.isLoading
               isLoading
               ? _buildLoadingIndicator()
               : _buildTimeZoneMiniWidgets(),
               
-              TextButton(
-                onPressed: _addTimeZone,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "+ Add Timezone",
-                      style: GoogleFonts.montserrat(
-                        fontSize: ThemeConstants.getDynamicFontSize(17),
-                        color: Theme.of(context).colorScheme.onSecondary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // addTimezoneButton(),
+
               const SizedBox(height: 30),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Add timezone textbutton
+  addTimezoneButton() {
+    return TextButton(
+      onPressed: _addTimeZone,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            "+ Add Timezone",
+            style: GoogleFonts.montserrat(
+              fontSize: ThemeConstants.getDynamicFontSize(17),
+              color: Theme.of(context).colorScheme.onSecondary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -269,21 +330,30 @@ class _TimezonesScreenState extends State<TimezonesScreen> {
                       timezoneList: TimezoneStates.timezoneselections,
                     );
                   },
-                  child: TimeZoneMiniWidget(
-                    isSelected: TimezoneStates.selectedTimeZone == timezone,
-                    dynamicMinutes: counter,
-                    timezone: timezone,
-                    selectedTimeZone: TimezoneStates.selectedTimeZone,
-                    isFirst: isFirst,
-                    onDeletePressed: () async {
-                      setState(() {
-                        TimezoneStates.timezoneselections.remove(timezone);
-                      });
-                      await HiveFunctions.saveTimeZones(
-                        selectedTimeZone: TimezoneStates.selectedTimeZone,
-                        timezoneList: TimezoneStates.timezoneselections,
+                  child: AnimatedBuilder(
+                    animation: _slideAnimation,
+                    builder: (context, child) {
+                      return SlideTransition(
+                        position: _slideAnimation,
+                        child: child,
                       );
                     },
+                    child: TimeZoneMiniWidget(
+                      isSelected: TimezoneStates.selectedTimeZone == timezone,
+                      dynamicMinutes: counter,
+                      timezone: timezone,
+                      selectedTimeZone: TimezoneStates.selectedTimeZone,
+                      isFirst: isFirst,
+                      onDeletePressed: () async {
+                        setState(() {
+                          TimezoneStates.timezoneselections.remove(timezone);
+                        });
+                        await HiveFunctions.saveTimeZones(
+                          selectedTimeZone: TimezoneStates.selectedTimeZone,
+                          timezoneList: TimezoneStates.timezoneselections,
+                        );
+                      },
+                    ),
                   ),
                 ),
               );

@@ -10,9 +10,11 @@ import 'package:time_slider/core/base/controllers/hive_class.dart';
 import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
 import 'package:time_slider/root/Presentation/Widgets/Alarm%20Components/alarm_card.dart';
 import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
 import 'package:time_slider/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
 import 'package:time_slider/root/Presentation/Modules/Drawer/drawerIcon.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
+import 'package:time_slider/root/Presentation/Widgets/svgIcon.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:vibration/vibration.dart';
@@ -61,16 +63,31 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     ref.listen<List<AlarmItem>>(AlarmStates.alarmsProvider, (previous, next) {
     });
 
+    final themeContext = Theme.of(context);
+    final primaryColor = themeContext.colorScheme.primary;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-      title:ThemeConstants.pageTitle(context, "Alarms"), 
-      leading: buildDrawerIconButton(context),
-      actions: [
-        IconButton(onPressed: () => showCupertinoModalPopup(
-        context: context,
-        builder: (context) => const ThemeSelectionDialogIOS(),
-      ), icon: Icon(Icons.sunny_snowing))
+      centerTitle: true,
+      title: ThemeConstants.pageTitle(context, "Alarms"), 
+      leading: IconButton(
+          onPressed: () => cupertinoSimpleDialogue(
+            context: context,
+            title: "Clear Alarms",
+            content: "Are you sure you want to clear all alarms?",
+            onYesPressed: () async {
+              await AlarmFunctions.clearAlarms(ref);
+              },
+          ),
+          icon: svgIcon(color: primaryColor),
+        ),
+      actions: 
+      [
+        IconButton(
+            onPressed: () => AlarmFunctions.addAlarm(context, ref),
+            icon: Icon(CupertinoIcons.add, color: primaryColor),
+          ),
       ],
       ),
       drawer: const DrawerContent(),

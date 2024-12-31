@@ -62,7 +62,7 @@ Widget build(BuildContext context, WidgetRef ref) {    // Watch the providers to
         Padding(
           padding: const EdgeInsets.only(top: 0.0, left: 8.0, right: 8),
           child: SizedBox(
-            height: ThemeConstants.screenHeight * 0.475,
+            height: ThemeConstants.screenHeight * 0.475 - 59,
             child: SingleChildScrollView(
               child: Column(
                 children: [
@@ -76,7 +76,7 @@ Widget build(BuildContext context, WidgetRef ref) {    // Watch the providers to
                       final itemText = task['text'];
                       final itemValue = task['value'];
                       final itemTime = TimezoneFunctions.formatTimeFromDateTime(task['time']) ?? "00:00AM";
-          
+                      
                       return TaskItem(
                         text: itemText,
                         value: itemValue,
@@ -94,7 +94,7 @@ Widget build(BuildContext context, WidgetRef ref) {    // Watch the providers to
                         ),
                       );
                     }),
-          
+                      
                   // Add task button for pending tasks
                   if (currentTab == 0)
                     Column(

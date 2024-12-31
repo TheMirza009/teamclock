@@ -62,7 +62,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
   String selectedTimezone = TimezoneStates.localTimezoneGlobal;
   late String ringtonePath;
   late LoopMode ringtoneLoopMode;
-  late String alarmTitle;
+  String alarmTitle = "Alarm";
 
   bool showError = false;
   bool isEmpty = false;
@@ -87,7 +87,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
       id: currentTime.microsecondsSinceEpoch,
       selectedTime: currentTime,
       timezone: selectedTimezone,
-      title: "",
+      title: alarmTitle,
       vibrateOnRing: false,
       deleteAfterRing: false,
       isActive: true,
@@ -217,10 +217,10 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
-                    if (selectedTime != null && alarmTitle != "") {
+                    if (selectedTime != null) {
                       AlarmItem newAlarm = AlarmItem(
                         id: DateTime.now().microsecondsSinceEpoch,
-                        title: alarmTitle,
+                        title: alarmTitle != "" ? "Alarm" : alarmTitle,
                         timezone: selectedTimezone,
                         selectedTime: selectedTime,
                         ringtone: ringtone,
@@ -464,7 +464,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return "Title cannot be empty";
+                            return "Alarm";
                           }
                           return null;
                         },

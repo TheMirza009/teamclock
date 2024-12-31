@@ -7,6 +7,7 @@ import 'package:time_slider/core/theme/theme_provider_class.dart';
 import 'package:time_slider/core/base/controllers/hive_class.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
 import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/homescreen.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
@@ -56,7 +57,8 @@ class _MyAppState extends State<MyApp> {
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,
-        home: const TimezonesScreen(),
+        home: const Homescreen(),
+        // home: const TimezonesScreen(),
       );
     });
   }

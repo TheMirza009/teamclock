@@ -1,9 +1,11 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:time_slider/root/Data/models/alarm_item.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
 import 'package:time_slider/main.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
 
 class NotificationController {
   static Future<void> initializeNotification() async {
@@ -110,13 +112,13 @@ class NotificationController {
     );
   }
 
-  static void showAlarmNotification() {
+  static void showAlarmNotification(AlarmItem alarm) {
     print("Triggering Alarm...");
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
         channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
-        title: 'Alarm',
+        title:"${alarm.title} • ${TimezoneFunctions.getCityAndCountryFromTimezone(alarm.timezone)}",
         body: "Currently ringing!",
         notificationLayout: NotificationLayout.BigText,
       ),
