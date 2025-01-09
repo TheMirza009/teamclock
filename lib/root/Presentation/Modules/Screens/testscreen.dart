@@ -1,19 +1,82 @@
+import 'dart:async';
 import 'dart:convert';
-
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/core/base/controllers/hive_class.dart';
+import 'package:time_slider/core/base/controllers/notification_controller.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+testPrint() {
+  print("NOTIFY");
+}
 
-class TestScreen extends ConsumerWidget {
+class TestScreen extends ConsumerStatefulWidget {
   const TestScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TestScreen> createState() => _TestScreenState();
+}
+
+class _TestScreenState extends ConsumerState<TestScreen> {
+  bool showing12HourFormat = true;
+  DateTime? _selectedDateTime;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Simulate a data loading operation
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        // Perform any required periodic update here
+      });
+    });
+  }
+
+  Future<void> _showTimePicker(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: !showing12HourFormat),
+          child: child!,
+        );
+      },
+    );
+
+     if (pickedTime != null) {
+      setState(() {
+        _selectedDateTime = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+      });
+
+      if (_selectedDateTime != null) {
+        print("Scheduling alarm at: $_selectedDateTime");
+        AndroidAlarmManager.oneShotAt(_selectedDateTime!, 001, NotificationController.showTestNotification);
+      } else {
+        print("The selected time is in the past or too close.");
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    showing12HourFormat = ref.watch(SettingsStates.show12HourFormat);
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -21,43 +84,25 @@ class TestScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-           ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+            Center(
+              child: Text(
+                _selectedDateTime != null
+                    ? "Selected DateTime: ${_selectedDateTime!.toLocal()}"
+                    : "No time selected",
+                style: GoogleFonts.poppins(fontSize: 18),
+                textAlign: TextAlign.center,
               ),
-              onPressed: () async {
-                final currentTime = tz.TZDateTime.now(tz.getLocation("Asia/Karachi"));
-                print("Current Time: ${currentTime}");
-                var encodedValue = await jsonEncode(currentTime.toString());
-                await HiveFunctions.saveData(key: 100, value: encodedValue);
-                final loadedValue = await HiveFunctions.readData(key: 100);
-                var decodedValue = await jsonDecode(loadedValue);
-                final loadedTime = await tz.TZDateTime.parse(tz.getLocation("Asia/Karachi"), decodedValue );
-                print("Loaded Time: ${loadedTime}");},
-              child: Text("Load Alarms"),
             ),
-
+            if (_selectedDateTime != null) // Null check for safe use
+              Text("Remaining time: ${_selectedDateTime!.toLocal().difference(DateTime.now()).inSeconds}"),
+            const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor:Theme.of(context).colorScheme.surfaceContainer),
-              onPressed: () async {
-                final time = DateTime.now();
-                final tztime = await tz.TZDateTime.now(tz.getLocation("Asia/Karachi"));
-                print("Standard: ${time.toString()}");
-                print("TZDateTime: ${tztime}");
-                print("Location: ${tz.local}");
-              },
-              child: Text("Print time"),
+              onPressed: () => _showTimePicker(context),
+              child: const Text("Pick a Time"),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainer),
-              onPressed: () async {
-                final alarmlist = ref.watch(AlarmStates.alarmsProvider);
-                print(alarmlist[0].selectedTime);
-              },
-              child: Text("Alarm Time Print"),
+              onPressed: () => AndroidAlarmManager.oneShot(const Duration(seconds: 0), 001, NotificationController.showTestNotification),
+              child: const Text("Shoot notification"),
             ),
           ],
         ),
@@ -66,36 +111,37 @@ class TestScreen extends ConsumerWidget {
   }
 }
 
- loadAndPrintAlarms() async {
-    var storedValue = await HiveFunctions.readData(key: 5);
 
-      if (storedValue != null) {
-        // Decode the JSON data into a list of maps
-        List<dynamic> jsonList = jsonDecode(storedValue);
+Future<void> loadAndPrintAlarms() async {
+  var storedValue = await HiveFunctions.readData(key: 5);
 
-        // Deserialize JSON into AlarmItem objects
-        List<AlarmItem> alarmList = jsonList.map((json) {
-          final timezone = json['timezone'];
-          final selectedTimeString = json['selectedTime'];
-          final DateTime utcTime = DateTime.parse(selectedTimeString);
-          final loadedSelectedTime = tz.TZDateTime.from(
-            utcTime,
-            tz.getLocation(timezone),
-          );
+  if (storedValue != null) {
+    // Decode the JSON data into a list of maps
+    List<dynamic> jsonList = jsonDecode(storedValue);
 
-          final AlarmItem alarm = AlarmItem(
-            id: json['id'],
-            title: json['title'],
-            timezone: timezone,
-            selectedTime: loadedSelectedTime,
-            isRinging: json['isRinging'] ?? false,
-            isActive: json['isActive'] ?? true,
-          );
+    // Deserialize JSON into AlarmItem objects
+    List<AlarmItem> alarmList = jsonList.map((json) {
+      final timezone = json['timezone'];
+      final selectedTimeString = json['selectedTime'];
+      final DateTime utcTime = DateTime.parse(selectedTimeString);
+      final loadedSelectedTime = tz.TZDateTime.from(
+        utcTime,
+        tz.getLocation(timezone),
+      );
 
-          print("Title: ${alarm.title}, Timezone: ${alarm.timezone}, Time: ${alarm.selectedTime}");
-          return alarm;
-        }).toList();
+      final AlarmItem alarm = AlarmItem(
+        id: json['id'],
+        title: json['title'],
+        timezone: timezone,
+        selectedTime: loadedSelectedTime,
+        isRinging: json['isRinging'] ?? false,
+        isActive: json['isActive'] ?? true,
+      );
 
-        // Update the provider with the loaded alarms
-      }
+      print("Title: ${alarm.title}, Timezone: ${alarm.timezone}, Time: ${alarm.selectedTime}");
+      return alarm;
+    }).toList();
+
+    // Update the provider with the loaded alarms
   }
+}

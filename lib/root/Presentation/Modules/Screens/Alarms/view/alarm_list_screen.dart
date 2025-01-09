@@ -46,7 +46,12 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     // Timer checks every second for alarm condition
     _timer = Timer.periodic(
       const Duration(seconds: 1), // Checked every second
-      (timer) => AlarmFunctions.triggerAlarms(timer, ref),  // Main Alarm Function Call
+      (timer) {
+        setState(() {
+          
+        });
+        // AlarmFunctions.triggerAlarms(ref);
+        },  // Main Alarm Function Call
     );
   }
 

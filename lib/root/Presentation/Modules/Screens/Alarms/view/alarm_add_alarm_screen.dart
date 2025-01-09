@@ -1,3 +1,4 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,12 @@ import 'package:time_slider/root/Presentation/Widgets/custom_list_tile.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
 import 'package:timezone/timezone.dart' as tz;
+
+// Trigger test
+void triggerTest(WidgetRef ref) {
+    print("Function 2 called........");
+    AlarmFunctions.triggerAlarms(ref);
+}
 
 // DEFAULT VALUES DECLARATIONS
 final _currentTime = tz.TZDateTime.now(tz.getLocation(TimezoneStates.localTimezoneGlobal));
@@ -53,6 +60,11 @@ class AddAlarmScreen extends ConsumerStatefulWidget {
 }
 
 class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
+
+ void triggerAlarmCallback() {
+    print("Function 1 called........");
+    triggerTest(ref);
+  }
 
   // DECLARATIONS
   late int selectedAmPmIndex; // 0 for AM, 1 for PM
@@ -220,18 +232,28 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
                 // CONFIRM Button
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async {
 
                     // Main alarm add function
                     tz.TZDateTime? selectedTime = _getSelectedTime();
                     tz.TZDateTime parsedTime = tz.TZDateTime.parse(tz.getLocation(selectedTimezone), selectedTime.toString());
+                    final int uniqueID = DateTime.now().millisecondsSinceEpoch % 1000000;
                     final ringtone = Ringtone(path: ringtonePath, loop: ringtoneLoopMode );
+                    
+                    // Android Alarm Manager state
+                    await AndroidAlarmManager.oneShotAt(
+                      parsedTime, 
+                      uniqueID, 
+                      triggerAlarmCallback,
+                      exact: true,
+                      wakeup: true,
+                      );
 
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
                     if (selectedTime != null) {
                       AlarmItem newAlarm = AlarmItem(
-                        id: DateTime.now().microsecondsSinceEpoch,
+                        id: uniqueID,
                         title: alarmTitle == "" ? "Alarm" : alarmTitle,
                         timezone: selectedTimezone,
                         selectedTime: parsedTime,

@@ -148,24 +148,26 @@ class AlarmFunctions {
   }
 }
 
+
+
   // Main Alarm Function
-static void triggerAlarms(Timer timer, WidgetRef ref) async {
+static void triggerAlarms(WidgetRef ref) async {
   final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
 
   for (final alarm in alarms) {
-    final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
+    // final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
 
     // Check if the alarm should ring
     if (!alarm.isRinging &&
-        alarm.selectedTime.hour == now.hour &&
-        alarm.selectedTime.minute == now.minute &&
-        alarm.selectedTime.second == now.second &&
+        // alarm.selectedTime.hour == now.hour &&
+        // alarm.selectedTime.minute == now.minute &&
+        // alarm.selectedTime.second == now.second &&
         alarm.isActive) {
       await fireAlarm(ref, alarm);
     }
   }
 
-  // Trigger UI update
+  // Trigger UI rebuild
   ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
 }
 

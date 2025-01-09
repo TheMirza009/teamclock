@@ -1,3 +1,4 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,10 +16,11 @@ void main() async {
   tz.initializeTimeZones();
   await Hive.initFlutter();
   await Hive.openBox("timezones");
+  AndroidAlarmManager.initialize();
   NotificationController.initializeNotification();
 
   //? TO-DO :
-  //1. Background service
+  //> Perfection remains
 
   // Request notification permission
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();

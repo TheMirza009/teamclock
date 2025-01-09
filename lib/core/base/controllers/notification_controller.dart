@@ -131,6 +131,25 @@ class NotificationController {
     );
   }
 
+  static void showTestNotification() {
+    print("Triggering Alarm...");
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 10,
+        channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
+        title:"Test Notification 1",
+        body: "Currently ringing!",
+        notificationLayout: NotificationLayout.BigText,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'stopalarm',
+          label: 'Stop Alarm',
+        ),
+      ],
+    );
+  }
+
   static void fireScheduledNotification(DateTime selectedTime) {
     print("Scheduling Alarm for $selectedTime...");
     AwesomeNotifications().createNotification(
