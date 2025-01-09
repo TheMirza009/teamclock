@@ -17,6 +17,9 @@ void main() async {
   await Hive.openBox("timezones");
   NotificationController.initializeNotification();
 
+  //? TO-DO :
+  //1. Background service
+
   // Request notification permission
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {

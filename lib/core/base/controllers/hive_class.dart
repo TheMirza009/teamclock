@@ -92,7 +92,7 @@ class HiveFunctions {
         'id': alarm.id,
         'title': alarm.title,
         'timezone': alarm.timezone,
-        'selectedTime': alarm.selectedTime.toIso8601String(),
+        'selectedTime': alarm.selectedTime.toString(),
         'ringtone': {
           'path': alarm.ringtone.path,
           'loop': alarm.ringtone.loop.index, // Save loop mode as an integer (index)
@@ -106,7 +106,7 @@ class HiveFunctions {
     await saveData(key: 5, value: jsonEncode(jsonList));
       print("Alarms saved:");
     for ( var alarm in jsonList) {
-      print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}, Alarm: ${Ringtones.extractTitle(alarm['ringtone']['path'])}");
+      print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}, Time: ${alarm['selectedTime']}");
     }
   }
 
@@ -140,6 +140,7 @@ class HiveFunctions {
 
         // Update the provider with the loaded alarms
         ref.read(AlarmStates.alarmsProvider.notifier).state = alarmList;
+        print("Title: ${alarmList}, Timezone: ${alarmList}");
       } else {
         // If no data is stored, set an empty list
         ref.read(AlarmStates.alarmsProvider.notifier).state = [];

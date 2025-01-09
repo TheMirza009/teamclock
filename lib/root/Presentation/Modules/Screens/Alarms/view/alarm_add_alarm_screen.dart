@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
 import 'package:time_slider/root/Data/models/ringtone_model.dart';
@@ -115,16 +116,26 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
   // Get selected Time from CUPERTINO PICKERS
   tz.TZDateTime? _getSelectedTime() {
-    final now = tz.TZDateTime.now(tz.local);  // Use the local timezone
-    int selectedHour = (selectedHourIndex + 1) % 12 + (selectedAmPmIndex == 1 ? 12 : 0); // Adjust for AM/PM
-    return tz.TZDateTime(
-      tz.local,  // Use dynamic timezone
-      now.year,
-      now.month,
-      now.day,
-      selectedHour,
-      selectedMinuteIndex,
-    );
+    try {
+      // Get the current time in the selected timezone
+      final now = tz.TZDateTime.now(tz.getLocation(selectedTimezone));
+
+      // Calculate the selected hour considering AM/PM
+      int selectedHour = (selectedHourIndex + 1) % 12 + (selectedAmPmIndex == 1 ? 12 : 0);
+
+      // Create the selected time
+      return tz.TZDateTime(
+        tz.getLocation(selectedTimezone),
+        now.year,
+        now.month,
+        now.day,
+        selectedHour,
+        selectedMinuteIndex,
+      );
+    } catch (e) {
+      print("Error in _getSelectedTime: $e");
+      return null; // Return null if any error occurs
+    }
   }
 
   // Function to set initial time values based on the current local time
@@ -189,7 +200,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
                     // Screen Title 
                     GestureDetector(
-                      onTap: () => print(_currentTime.hour),
+                      onTap: () => print(_getSelectedTime()),
                       child: Text(
                         widget.existingAlarm == null ? "Add Alarm" : "Edit Alarm",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -213,6 +224,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
                     // Main alarm add function
                     tz.TZDateTime? selectedTime = _getSelectedTime();
+                    tz.TZDateTime parsedTime = tz.TZDateTime.parse(tz.getLocation(selectedTimezone), selectedTime.toString());
                     final ringtone = Ringtone(path: ringtonePath, loop: ringtoneLoopMode );
 
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
@@ -222,7 +234,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                         id: DateTime.now().microsecondsSinceEpoch,
                         title: alarmTitle == "" ? "Alarm" : alarmTitle,
                         timezone: selectedTimezone,
-                        selectedTime: selectedTime,
+                        selectedTime: parsedTime,
                         ringtone: ringtone,
                         deleteAfterRing: deleteAfterRing,
                         vibrateOnRing: vibrateOnRing,

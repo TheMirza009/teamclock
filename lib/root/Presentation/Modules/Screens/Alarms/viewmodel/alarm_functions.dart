@@ -148,7 +148,6 @@ class AlarmFunctions {
   }
 }
 
-
   // Main Alarm Function
 static void triggerAlarms(Timer timer, WidgetRef ref) async {
   final alarms = ref.read(AlarmStates.alarmsProvider); // Read alarms
@@ -170,7 +169,6 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
   ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
 }
 
-
   // Add Alarm Function
   static Future<void> addAlarm(BuildContext context, WidgetRef ref) async {
     print((DateTime.now().hour % 12));
@@ -191,6 +189,7 @@ static void triggerAlarms(Timer timer, WidgetRef ref) async {
                 vibrateOnRing: alarm.vibrateOnRing,
               ),
             ];
+            print("PARSED TIME : ${tz.TZDateTime.parse(tz.getLocation(alarm.timezone), alarm.selectedTime.toString())}");
             final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
             HiveFunctions.saveAlarmList(alarmList);
           },

@@ -5,6 +5,7 @@ import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_
 import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/testscreen.dart';
 
 class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
@@ -48,7 +49,8 @@ class Homescreen extends StatelessWidget {
               return const AlarmListScreen();
             case 3:
             default:
-              return const SettingsScreen();
+              return const TestScreen(); 
+              // return const SettingsScreen();
           }
         },
       ),
