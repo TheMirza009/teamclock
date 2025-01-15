@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/core/base/controllers/notification_controller.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:time_slider/core/base/controllers/hive_class.dart';
 import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
+import 'package:time_slider/core/base/controllers/port_controller.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/testscreen.dart';
 import 'package:time_slider/root/Presentation/Widgets/Alarm%20Components/alarm_card.dart';
 import 'package:time_slider/core/theme/theme_constants.dart';
 import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
@@ -36,6 +41,8 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     super.initState();
     tz.initializeTimeZones();
     _initializeAlarms();
+    PortMessageController.initialize();
+    PortMessageController.handleReceived(onReceived: (message) => print("MESSAGE RECEIVED: $message"));
 
     // Fade Controller for total dismissal
     fadeController = AnimationController(
@@ -85,7 +92,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
 
   @override
   Widget build(BuildContext context) {
-    final alarms = ref.watch(AlarmStates.alarmsProvider);
+    final List<AlarmItem> alarms = ref.watch(AlarmStates.alarmsProvider);
     ref.listen<List<AlarmItem>>(AlarmStates.alarmsProvider, (previous, next) {
       if (previous != next) {
         final alarms = ref.watch(AlarmStates.alarmsProvider);
@@ -204,23 +211,34 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         print("VIBRATE");
                       },
                       onTap: () async {
-                        AlarmFunctions.fireAlarm(ref, alarm);
-                      }, 
+                        // AlarmFunctions.fireAlarm(ref, alarm);
+                        await AndroidAlarmManager.oneShotAt(
+                              alarm.selectedTime,
+                              alarm.id,
+                              // AlarmRing.printAlarmDetails,
+                              AlarmRing.sendTestPortMessage,
+                              params: alarm.toJson(),
+                              exact: true,
+                              alarmClock: true,
+                              wakeup: true,
+                              allowWhileIdle: true,
+                            );
+                      },
 
                       // Main ALARM CARD UI
                       child: AlarmCard(
-                        ref: ref,
-                        alarm: alarm,
-                        index: index,
-                        showsubtimes: false,
-                        stopAlarmFunction: () async {
-                          alarm.isRinging = false;
-                          if (alarm.deleteAfterRing) await singleFadeController.forward();
-                          await AlarmFunctions.stopAlarm(ref, alarm);
-                          await Future.delayed(const Duration(milliseconds: 400)); 
-                          singleFadeController.reset(); 
-                          }
-                      ),
+                              ref: ref,
+                              alarm: alarm,
+                              index: index,
+                              showsubtimes: false,
+                              stopAlarmFunction: () async {
+                                alarm.isRinging = false;
+                                if (alarm.deleteAfterRing)
+                                  await singleFadeController.forward();
+                                  await AlarmFunctions.stopAlarm(ref, alarm);
+                                  await Future.delayed(const Duration(milliseconds: 400));
+                                  singleFadeController.reset();
+                              }),
                     ),
                   ),
                 );

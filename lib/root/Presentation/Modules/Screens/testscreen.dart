@@ -8,9 +8,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_states.dart';
@@ -45,18 +43,18 @@ class _TestScreenState extends ConsumerState<TestScreen> {
       });
     });
 
- // Initialize the ReceivePort if not already initialized
-  if (globalReceivePort == null) {
-    globalReceivePort = ReceivePort();
-    globalReceivePort!.listen((message) {
-      print("Received message: $message");
-      if (message is Map<String, dynamic>) {
-        final alarmId = message['id'];
-        print("Alarm with ID $alarmId was triggered.");
-      }
-    });
+    // Initialize the ReceivePort if not already initialized
+    if (globalReceivePort == null) {
+      globalReceivePort = ReceivePort();
+      globalReceivePort!.listen((message) {
+        print("Received message: $message");
+        if (message is Map<String, dynamic>) {
+          final alarmId = message['id'];
+          print("Alarm with ID $alarmId was triggered.");
+        }
+      });
+    }
   }
-}
 
   Future<void> _showTimePicker(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(

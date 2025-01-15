@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:time_slider/core/base/controllers/notification_controller.dart';
+import 'package:time_slider/core/base/controllers/port_controller.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/testscreen.dart';
@@ -60,6 +61,8 @@ class AlarmRing {
     // try-catch
     try {
 
+      print("PARAMS: $params");
+
       // Decode JSON into AlarmItem
       AlarmItem alarm = AlarmItem.fromJson(params);
       NotificationController.showAlarmNotification(alarm);
@@ -75,7 +78,7 @@ class AlarmRing {
       }
 
       // Send data back to the main isolate
-      globalReceivePort?.sendPort?.send({'id': alarm.id});
+      globalReceivePort?.sendPort.send({'id': alarm.id});
 
       // Print the alarm details
       print('Alarm triggered (ID: $id):');
@@ -86,6 +89,31 @@ class AlarmRing {
       print('Error decoding alarm data: $e');
     }
   }
+
+  static void sendTestPortMessage(int id) {
+    PortMessageController.sendMessage({"id":id});
+  }
+
+  static void sendPortMessage(int id, Map<String, dynamic> params) async {
+    // Initializations
+    // tz.initializeTimeZones();
+    // await NotificationController.initializeNotification();
+
+    try {
+      // Decode JSON into AlarmItem (if applicable)
+      if (params.containsKey('sendPort')) {
+        SendPort sendPort = params['sendPort'] as SendPort;
+
+        // Simulate an alarm trigger and send a message back
+        sendPort.send({'id': id});
+      }
+
+      print('Alarm triggered (ID: $id).');
+    } catch (e) {
+      print('Error in sendPortMessage: $e');
+    }
+  }
+
 }
 
 
