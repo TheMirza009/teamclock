@@ -232,9 +232,11 @@ class NotificationController {
           final alarms = ref.watch(AlarmStates.alarmsProvider);
           print(receivedAction.title);
           AlarmFunctions.stopAlarm(ref, alarms[0]);
-          alarms.forEach((alarm) => AndroidAlarmManager.cancel(alarm.id));
+          for (var alarm in alarms) {
+            AndroidAlarmManager.cancel(alarm.id);
+          }
            FlutterRingtonePlayer().stop();
-          AlarmRing().stopAlarm();
+          const AlarmRing().stopAlarm();
         }
       },
     );

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:time_slider/core/base/controllers/notification_controller.dart';
 import 'package:time_slider/root/Data/models/alarm_item.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/testscreen.dart';
 import 'package:vibration/vibration.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -21,7 +23,9 @@ class AlarmRing {
       10, //This ID has to be the same as above
       stopAlarmCallback,
       exact: true,
+      alarmClock: true,
       wakeup: true,
+      allowWhileIdle: true,
     );
   }
 
@@ -55,6 +59,7 @@ class AlarmRing {
 
     // try-catch
     try {
+
       // Decode JSON into AlarmItem
       AlarmItem alarm = AlarmItem.fromJson(params);
       NotificationController.showAlarmNotification(alarm);
@@ -68,6 +73,9 @@ class AlarmRing {
       if (alarm.vibrateOnRing) {
         startVibration();
       }
+
+      // Send data back to the main isolate
+      globalReceivePort?.sendPort?.send({'id': alarm.id});
 
       // Print the alarm details
       print('Alarm triggered (ID: $id):');
