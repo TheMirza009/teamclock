@@ -145,7 +145,7 @@ class _TestScreenState extends ConsumerState<TestScreen> {
                   await AndroidAlarmManager.oneShotAt(
                     selectedTime,
                     alarm.id,
-                    AlarmRing.printAlarmDetails,
+                    AlarmRing.alarmCallback,
                     params: alarm.toJson(),
                       
                     exact: true,

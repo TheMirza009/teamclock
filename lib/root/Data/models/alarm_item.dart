@@ -42,6 +42,7 @@ class AlarmItem {
       timezone: TimezoneStates.localTimezoneGlobal,  // Use the global timezone
       selectedTime: currentTime,  // Use the current time in selectedTime
       ringtone: const Ringtone( loop: LoopMode.one,  path: Ringtones.defaultRingtone ),
+      vibrateOnRing: false,
       isRinging: false,
       isActive: false,
     );
@@ -59,8 +60,9 @@ class AlarmItem {
       timezone: json['timezone'],
       selectedTime: selectedTime,
       ringtone: ringtone,
-      isRinging: json['isRinging'],
       isActive: json['isActive'],
+      vibrateOnRing: json['vibrateOnRing'],
+      isRinging: json['isRinging'],
     );
   }
 
@@ -72,8 +74,9 @@ class AlarmItem {
       'timezone': timezone,
       'selectedTime': selectedTime.toIso8601String(),  // Convert TZDateTime to ISO string
       'ringtone': ringtone.toJson(),  // Assuming Ringtone has a toJson method
-      'isRinging': isRinging,
       'isActive': isActive,
+      'vibrateOnRing': vibrateOnRing,
+      'isRinging': isRinging,
     };
   }
 }

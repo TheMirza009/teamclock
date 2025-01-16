@@ -229,12 +229,12 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         print("VIBRATE");
                       },
                       onTap: () async {
-                        print("TAPPED");
+                        print("TAPPED: ID ${alarm.id}");
                         // AlarmFunctions.fireAlarm(ref, alarm);
                         await AndroidAlarmManager.oneShotAt(
                           alarm.selectedTime,
                           alarm.id,
-                          AlarmRing.printAlarmDetails,
+                          AlarmRing.alarmCallback,
                           // AlarmRing.sendTestPortMessage,
                           params: alarm.toJson(),
                           exact: true,
@@ -252,9 +252,10 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                               showsubtimes: false,
                               stopAlarmFunction: () async {
                                 alarm.isRinging = false;
-                                if (alarm.deleteAfterRing)
                                   await singleFadeController.forward();
-                                  await AlarmFunctions.stopAlarm(ref, alarm);
+                                  AlarmRing.stopAlarm(alarm.id);
+                                  AlarmFunctions.finishAlarm(ref, alarm.id);
+                                  // await AlarmFunctions.stopAlarm(ref, alarm);
                                   await Future.delayed(const Duration(milliseconds: 400));
                                   singleFadeController.reset();
                               }),

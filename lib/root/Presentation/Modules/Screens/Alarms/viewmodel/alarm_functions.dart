@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_add_alarm_screen.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,14 +24,29 @@ class AlarmFunctions {
 
   // Stop Alarm
   static Future<void> stopAlarm(WidgetRef ref, AlarmItem alarm) async {
-    await AwesomeNotifications().cancel(10);
-    await player.stop();
-    await Vibration.cancel();
+    await AwesomeNotifications().cancel(alarm.id); // Cancel the notification
+    await player.stop(); // Stop the playback
+    await Vibration.cancel(); // Cancel the vibration
     _vibrationTimer?.cancel();
-    alarm.isRinging = false;
-    // Future.delayed(const Duration(milliseconds: 300));
-    if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
+    finishAlarm(ref, alarm.id);
   }
+
+  static void finishAlarm(WidgetRef ref, int alarmID) {
+    List<AlarmItem> alarms = ref.read(AlarmStates.alarmsProvider);
+    AlarmItem alarm = alarms.firstWhere((alarm) => alarm.id == alarmID);
+    if (alarm != null) {
+      alarm.isRinging = false;
+      if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
+    }
+  }
+
+   // if (alarm.deleteAfterRing) {
+
+      //   // Remove the alarm from the list
+        // alarms.removeWhere((existingAlarm) => existingAlarm.id == alarm.id);
+        // ref.read(AlarmStates.alarmsProvider.notifier).state = List.from(alarms);
+        // HiveFunctions.saveAlarmList(alarms);
+      // }
 
   // Play sound
   static Future<void> playAlarmSound(WidgetRef ref, AlarmItem alarm) async {
@@ -131,7 +148,13 @@ class AlarmFunctions {
     return "${difference.inSeconds} seconds remain";
   }
 
-  if (difference.inSeconds == 0 && difference.inMinutes == 0 ) return "Alarm Ringing!";
+  if (difference.inSeconds < 60 && difference.inSeconds > 0) {
+    return "${difference.inSeconds} seconds remain";
+  }
+
+  if (difference.inHours < 1) {
+      return "${difference.inMinutes} minute and ${difference.inSeconds % 60} seconds remain.";
+  }
 
   // Extract hours and minutes
   final hours = difference.inHours;
@@ -205,7 +228,16 @@ static void triggerAlarms(WidgetRef ref) async {
                 vibrateOnRing: alarm.vibrateOnRing,
               ),
             ];
-            print("PARSED TIME : ${tz.TZDateTime.parse(tz.getLocation(alarm.timezone), alarm.selectedTime.toString())}");
+            await AndroidAlarmManager.oneShotAt(
+              alarm.selectedTime,
+              alarm.id,
+              AlarmRing.alarmCallback,
+              params: alarm.toJson(),
+              exact: true,
+              alarmClock: true,
+              wakeup: true,
+              allowWhileIdle: true,
+            );
             final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
             HiveFunctions.saveAlarmList(alarmList);
           },

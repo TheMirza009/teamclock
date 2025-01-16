@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:time_slider/core/base/controllers/notification_controller.dart';
@@ -18,10 +19,10 @@ class AlarmRing {
 
   // Stop Alarm Function
   @pragma("vm:entry-point")
-  void stopAlarm() async {
+  static void stopAlarm(int alarmID) async {
     await AndroidAlarmManager.oneShot(
       Duration.zero,
-      10, //This ID has to be the same as above
+      alarmID,
       stopAlarmCallback,
       exact: true,
       alarmClock: true,
@@ -31,14 +32,56 @@ class AlarmRing {
   }
 
   // Stop Ringtone
-  static Future<void> stopAlarmCallback() async {
-    final alarms = AlarmStates.alarmList;
+  static Future<void> stopAlarmCallback(int alarmID) async {
     _vibrationTimer?.cancel();
     await player.stop();
-    alarms.forEach((alarm) async => await AndroidAlarmManager.cancel(alarm.id));
+    if (alarmID != null) {
+      await Future.wait([
+        AndroidAlarmManager.cancel(alarmID),
+        AwesomeNotifications().cancel(alarmID),
+      ]);
+      // PortMessageController.sendMessage({"id": alarmID});
+    }
   }
 
-  // Vibration Statr
+  // Callback function that prints alarm details
+  static void alarmCallback(int id, Map<String, dynamic> params) async {
+
+    // Initializations
+    tz.initializeTimeZones();
+    await NotificationController.initializeNotification();
+
+    try {
+      // Decode from JSON and trigger Alarm
+      AlarmItem alarm = AlarmItem.fromJson(params);
+      triggerAlarmIsolate(alarm);
+    } catch (e) {
+      print('Error decoding alarm data: $e');
+    }
+  }
+
+  static void triggerAlarmIsolate(AlarmItem alarm) {
+    if (alarm.isActive) {
+      NotificationController.showAlarmNotification(alarm);
+      player.play(
+        android: AndroidSounds.alarm,
+        ios: IosSounds.glass,
+        asAlarm: true,
+      );
+
+      // Start Vibration
+      if (alarm.vibrateOnRing == true) {
+        startVibration();
+      }
+
+      // Send data back to the main isolate
+      PortMessageController.sendMessage({"id": alarm.id});
+    } else {
+      print("ALARM ISOLATE: Alarm called but it is not enabled.");
+    }
+  }
+
+    // Vibration Statr
   static void startVibration() async {
     _vibrationTimer = Timer.periodic(
       const Duration(milliseconds: 1300),
@@ -51,70 +94,9 @@ class AlarmRing {
     );
   }
 
-  // Callback function that prints alarm details
-  static void printAlarmDetails(int id, Map<String, dynamic> params) async {
-
-    // Initializations
-    tz.initializeTimeZones();
-    await NotificationController.initializeNotification();
-
-    // try-catch
-    try {
-
-      print("PARAMS: $params");
-
-      // Decode JSON into AlarmItem
-      AlarmItem alarm = AlarmItem.fromJson(params);
-      NotificationController.showAlarmNotification(alarm);
-      player.play(
-        android: AndroidSounds.alarm,
-        ios: IosSounds.glass,
-        asAlarm: true,
-      );
-
-      // Start Vibration
-      if (alarm.vibrateOnRing) {
-        startVibration();
-      }
-
-      // Send data back to the main isolate
-      // globalReceivePort?.sendPort.send({'id': alarm.id});
-      PortMessageController.sendMessage({"id":id});
-
-      // Print the alarm details
-      print('Alarm triggered (ID: $id):');
-      print('Title: ${alarm.title}');
-      print('Timezone: ${alarm.timezone}');
-      print('Selected Time: ${alarm.selectedTime}');
-    } catch (e) {
-      print('Error decoding alarm data: $e');
-    }
-  }
-
   static void sendTestPortMessage(int id) {
     PortMessageController.sendMessage({"id":id});
   }
-
-  static void sendPortMessage(int id, Map<String, dynamic> params) async {
-    // Initializations
-    // tz.initializeTimeZones();
-    // await NotificationController.initializeNotification();
-
-    try {
-      // Decode JSON into AlarmItem (if applicable)
-      if (params.containsKey('sendPort')) {
-        SendPort sendPort = params['sendPort'] as SendPort;
-
-        // Simulate an alarm trigger and send a message back
-        sendPort.send({'id': id});
-      }
-
-      print('Alarm triggered (ID: $id).');
-    } catch (e) {
-      print('Error in sendPortMessage: $e');
-    }
-  }
-
 }
 
 

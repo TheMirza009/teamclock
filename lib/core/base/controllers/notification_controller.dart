@@ -115,25 +115,6 @@ class NotificationController {
     );
   }
 
-  static void showAlarmNotification(AlarmItem alarm) {
-    print("Triggering Alarm...");
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 10,
-        channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
-        title:"${alarm.title} • ${TimezoneFunctions.getCityAndCountryFromTimezone(alarm.timezone)}",
-        body: "Currently ringing!",
-        notificationLayout: NotificationLayout.BigText,
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          key: 'stopalarm',
-          label: 'Stop Alarm',
-        ),
-      ],
-    );
-  }
-
   static void showTestNotification() {
     print("Triggering Alarm...");
     AwesomeNotifications().createNotification(
@@ -183,6 +164,28 @@ class NotificationController {
     );
   }
 
+  static void showAlarmNotification(AlarmItem alarm) {
+    print("Triggering Alarm...");
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: alarm.id,
+        channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
+        title:"${alarm.title} • ${TimezoneFunctions.getCityAndCountryFromTimezone(alarm.timezone)}",
+        body: "Currently ringing!",
+        notificationLayout: NotificationLayout.BigText,
+        locked: true,
+        payload: {
+          'alarmId': alarm.id.toString(), // Pass alarm.id in payload
+        },
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'stopalarm',
+          label: 'Stop Alarm',
+        ),
+      ],
+    );
+  }
 
   static void setListeners(WidgetRef ref) {
     final timerNotifierProvider = PomodoroStates.timerNotifierProvider;
@@ -229,14 +232,24 @@ class NotificationController {
         }
 
         if (receivedAction.buttonKeyPressed == "stopalarm") {
-          final alarms = ref.watch(AlarmStates.alarmsProvider);
           print(receivedAction.title);
-          AlarmFunctions.stopAlarm(ref, alarms[0]);
-          for (var alarm in alarms) {
-            AndroidAlarmManager.cancel(alarm.id);
+
+          final alarmId = int.tryParse(receivedAction.payload?['alarmId'] ?? '');
+          if (alarmId == null) {
+            print('Invalid alarm ID in notification payload.');
+            return;
           }
-           FlutterRingtonePlayer().stop();
-          const AlarmRing().stopAlarm();
+
+          final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
+
+          if (alarm != null) {
+            // AlarmFunctions.stopAlarm(ref, alarm);
+            AlarmRing.stopAlarm(alarm.id);
+            AlarmFunctions.finishAlarm(ref, alarm.id);
+            print('Alarm with ID $alarmId stopped.');
+          } else {
+            print('Alarm with ID $alarmId not found.');
+          }
         }
       },
     );
