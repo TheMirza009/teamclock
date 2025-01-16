@@ -78,7 +78,8 @@ class AlarmRing {
       }
 
       // Send data back to the main isolate
-      globalReceivePort?.sendPort.send({'id': alarm.id});
+      // globalReceivePort?.sendPort.send({'id': alarm.id});
+      PortMessageController.sendMessage({"id":id});
 
       // Print the alarm details
       print('Alarm triggered (ID: $id):');

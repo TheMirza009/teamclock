@@ -42,7 +42,10 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
     tz.initializeTimeZones();
     _initializeAlarms();
     PortMessageController.initialize();
-    PortMessageController.handleReceived(onReceived: (message) => print("MESSAGE RECEIVED: $message"));
+    PortMessageController.handleReceived(onReceived: (message) {
+      print("MESSAGE RECEIVED: $message");
+      ringAlarmFromIsolate(message);
+      });
 
     // Fade Controller for total dismissal
     fadeController = AnimationController(
@@ -60,6 +63,15 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
         // AlarmFunctions.triggerAlarms(ref);
         },  // Main Alarm Function Call
     );
+  }
+
+  void ringAlarmFromIsolate(Map<String, dynamic> message) {
+    if (message['id'] != null) {
+      List<AlarmItem> alarmlist = ref.watch(AlarmStates.alarmsProvider);
+      AlarmItem alarm = alarmlist.firstWhere((alarm) => alarm.id == message['id']);
+      alarm.isRinging = true;
+      // AlarmFunctions.fireAlarm(ref, alarm);
+    }
   }
 
   @override
@@ -99,6 +111,12 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
         AlarmStates.alarmList = alarms;
       }
     });
+
+    // Call onReceived
+    // PortMessageController.handleReceived(onReceived: (message) {
+    //   print("MESSAGE RECEIVED: $message");
+    //   ringAlarmFromIsolate(message);
+    //   });
 
     // Color declarations
     final themeContext = Theme.of(context);
@@ -211,18 +229,19 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                         print("VIBRATE");
                       },
                       onTap: () async {
+                        print("TAPPED");
                         // AlarmFunctions.fireAlarm(ref, alarm);
                         await AndroidAlarmManager.oneShotAt(
-                              alarm.selectedTime,
-                              alarm.id,
-                              // AlarmRing.printAlarmDetails,
-                              AlarmRing.sendTestPortMessage,
-                              params: alarm.toJson(),
-                              exact: true,
-                              alarmClock: true,
-                              wakeup: true,
-                              allowWhileIdle: true,
-                            );
+                          alarm.selectedTime,
+                          alarm.id,
+                          AlarmRing.printAlarmDetails,
+                          // AlarmRing.sendTestPortMessage,
+                          params: alarm.toJson(),
+                          exact: true,
+                          alarmClock: true,
+                          wakeup: true,
+                          allowWhileIdle: true,
+                        );
                       },
 
                       // Main ALARM CARD UI
