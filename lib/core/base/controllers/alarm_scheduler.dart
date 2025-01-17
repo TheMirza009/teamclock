@@ -1,145 +1,91 @@
-// import 'dart:async';
-// import 'dart:io';
-// import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-// import 'package:bringtoforeground/bringtoforeground.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:path_provider/path_provider.dart';
-// import 'package:clockee/services/file_proxy.dart';
-// import 'package:clockee/stores/observable_alarm/observable_alarm.dart';
-// import '../main.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:time_slider/root/Data/models/alarm_item.dart';
+import 'package:time_slider/root/Data/models/weekdays_model.dart';
+import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:timezone/timezone.dart' as tz;
 
-// class AlarmScheduler {
-//   clearAlarm(ObservableAlarm alarm) {
-//     print("clearAlarm: ${alarm.id}");
-//     for (var i = 0; i < 7; i++) {
-//       AndroidAlarmManager.cancel(alarm.id! * 7 + i);
-//     }
-//   }
+class AlarmScheduler {
 
-//   /*
-//     To wake up the device and run something on top of the lockscreen,
-//     this currently requires the hack from here to be implemented:
-//     https://github.com/flutter/flutter/issues/30555#issuecomment-501597824
-//   */
-//   Future<void> scheduleAlarm(ObservableAlarm alarm) async {
-//     final days = alarm.days;
+  // Main function
+  static void scheduleAlarm(AlarmItem alarm) {
+    if (alarm.repeat == Weekday.none()) {
+      _oneShot(alarm);  // One-shot alarm
+    } else {
+      _schedulePeriodicAlarms(alarm); // Periodic Alarm for days
+    }
+  }
 
-//     final scheduleId = alarm.id! * 7;
-//     print("scheduleId: $scheduleId");
-//     print("days.length: ${days.length}");
-//     bool repeatAlarm = false;
-//     for (var i = 0; i < days.length; i++) {
-//       await AndroidAlarmManager.cancel(scheduleId + i);
-//       print("alarm.active: ${alarm.active}");
-//       print("days[$i]: ${days[i]}");
-//       if (alarm.active! && days[i]) {
-//         // Repeat alarm
-//         print("Alarm active for day $i");
-//         repeatAlarm = true;
-//         final targetDateTime = nextWeekday(i + 1, alarm.hour!, alarm.minute!);
-//         await newShot(targetDateTime, scheduleId + i);
-//       } else if (alarm.active! && !repeatAlarm && i == days.length - 1) {
-//         // One time alarm
-//         var checkedDay = DateTime.now();
-//         var targetDateTime = DateTime(checkedDay.year, checkedDay.month,
-//             checkedDay.day, alarm.hour!, alarm.minute!);
+  // Only Rings once | No repitition
+  static void _oneShot(AlarmItem alarm) async {
+    await AndroidAlarmManager.oneShotAt(
+      alarm.selectedTime,
+      alarm.id,
+      AlarmRing.alarmCallback,
+      exact: true,
+      wakeup: true,
+      allowWhileIdle: true,
+      alarmClock: true,
+    );
+  }
 
-//         if (targetDateTime.millisecondsSinceEpoch <
-//             checkedDay.millisecondsSinceEpoch) // Time past?
-//           targetDateTime =
-//               targetDateTime.add(const Duration(days: 1)); // Prepare for next day
+  // Rings if other weekdays are selected
+  static void _schedulePeriodicAlarms(AlarmItem alarm) {
+    final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
 
-//         print("targetDateTime ${targetDateTime.toString()}");
-//         await newShot(targetDateTime, scheduleId + i);
-//       }
-//     }
-//   }
+    // Schedule for each day that is true in alarm.repeat
+    if (alarm.repeat.monday) {
+      _scheduleWeeklyAlarm(alarm, now, 1);
+    }
+    if (alarm.repeat.tuesday) {
+      _scheduleWeeklyAlarm(alarm, now, 2);
+    }
+    if (alarm.repeat.wednesday) {
+      _scheduleWeeklyAlarm(alarm, now, 3);
+    }
+    if (alarm.repeat.thursday) {
+      _scheduleWeeklyAlarm(alarm, now, 4);
+    }
+    if (alarm.repeat.friday) {
+      _scheduleWeeklyAlarm(alarm, now, 5);
+    }
+    if (alarm.repeat.saturday) {
+      _scheduleWeeklyAlarm(alarm, now, 6);
+    }
+    if (alarm.repeat.sunday) {
+      _scheduleWeeklyAlarm(alarm, now, 7);
+    }
+  }
 
-//   DateTime nextWeekday(int weekday, alarmHour, alarmMinute) {
-//     var checkedDay = DateTime.now();
+  // Weekly AndroidAlarmManager function call
+  static void _scheduleWeeklyAlarm(AlarmItem alarm, tz.TZDateTime now, int weekday) async {
+    final tz.TZDateTime scheduledTime = _nextInstanceOfWeekday(now, weekday, alarm.selectedTime);
 
-//     if (checkedDay.weekday == weekday) {
-//       final todayAlarm = DateTime(checkedDay.year, checkedDay.month,
-//           checkedDay.day, alarmHour, alarmMinute);
+    await AndroidAlarmManager.periodic(
+      const Duration(days: 7), // Weekly repetition
+      alarm.id + weekday, // Unique ID for each weekday alarm
+      AlarmRing.alarmCallback,
+      startAt: scheduledTime,
+      exact: true,
+      wakeup: true,
+      allowWhileIdle: true,
+    );
+  }
 
-//       if (checkedDay.isBefore(todayAlarm)) {
-//         return todayAlarm;
-//       }
-//       return todayAlarm.add(const Duration(days: 7));
-//     }
+  // Weekday based selected Time
+  static tz.TZDateTime _nextInstanceOfWeekday(tz.TZDateTime now, int weekday, tz.TZDateTime selectedTime) {
+    tz.TZDateTime scheduledTime = tz.TZDateTime(
+      now.location,
+      now.year,
+      now.month,
+      now.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
 
-//     while (checkedDay.weekday != weekday) {
-//       checkedDay = checkedDay.add(const Duration(days: 1));
-//     }
+    while (scheduledTime.weekday != weekday || scheduledTime.isBefore(now)) {
+      scheduledTime = scheduledTime.add(const Duration(days: 1));
+    }
 
-//     return DateTime(checkedDay.year, checkedDay.month, checkedDay.day,
-//         alarmHour, alarmMinute);
-//   }
-
-//   static void callback(int id) async {
-//     final alarmId = callbackToAlarmId(id);
-
-//     createAlarmFlag(alarmId);
-//   }
-
-//   /// Because each alarm might need to be able to schedule up to 7 android alarms (for each weekday)
-//   /// a means is required to convert from the actual callback ID to the ID of the alarm saved
-//   /// in internal storage. To do so, we can assign a range of 7 per alarm and use ceil to get to
-//   /// get the alarm ID to access the list of songs that could be played
-//   static int callbackToAlarmId(int callbackId) {
-//     return (callbackId / 7).floor();
-//   }
-
-//   /// Creates a flag file that the main isolate can find on life cycle change
-//   /// For now just abusing the FileProxy class for testing
-//   static void createAlarmFlag(int id) async {
-//     print('Creating a new alarm flag for ID $id');
-//     final dir = await getApplicationDocumentsDirectory();
-//     JsonFileStorage.toFile(File("${dir.path}/$id.alarm")).writeList([]);
-
-//     final alarms = await JsonFileStorage().readList();
-//     var alarm = alarms.firstWhere((element) => element.id == id);
-
-//     if (alarm.active! && Platform.isAndroid) {
-//       restartApp();
-//       Timer(const Duration(seconds: 5), () {
-//         Bringtoforeground.bringAppToForeground();
-//       });
-//       return;
-//     }
-//     final hours = alarm.hour.toString().padLeft(2, '0');
-//     final minutes = alarm.minute.toString().padLeft(2, '0');
-
-//     await notifications.init(onSelectNotification: (String? payload) async {
-//       // if (payload == null || payload.trim().isEmpty) return null;
-//       print('notification payload $payload');
-//       throw Exception('New Notification');
-//       // return;
-//     });
-
-//     await notifications.getNotificationAppLaunchDetails().then((details) {
-//       notificationAppLaunchDetails = details;
-//     });
-
-//     notifications.show(
-//       id: id,
-//       icon: 'notification_logo',
-//       importance: Importance.max,
-//       priority: Priority.high,
-//       ticker: 'ticker',
-//       title: '$hours:$minutes',
-//       body: alarm.name,
-//       sound: RawResourceAndroidNotificationSound(''),
-//       payload: id.toString(),
-//     );
-//   }
-
-//   Future<void> newShot(DateTime targetDateTime, int id) async {
-//     await AndroidAlarmManager.oneShotAt(
-//       targetDateTime, 
-//       id, 
-//       callback,
-//       alarmClock: true,
-//       rescheduleOnReboot: true);
-//   }
-// }
+    return scheduledTime;
+  }
+}

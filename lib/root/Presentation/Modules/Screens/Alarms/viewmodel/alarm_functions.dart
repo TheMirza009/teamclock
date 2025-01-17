@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:time_slider/core/base/controllers/alarm_scheduler.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_add_alarm_screen.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:vibration/vibration.dart';
@@ -228,16 +229,7 @@ static void triggerAlarms(WidgetRef ref) async {
                 vibrateOnRing: alarm.vibrateOnRing,
               ),
             ];
-            await AndroidAlarmManager.oneShotAt(
-              alarm.selectedTime,
-              alarm.id,
-              AlarmRing.alarmCallback,
-              params: alarm.toJson(),
-              exact: true,
-              alarmClock: true,
-              wakeup: true,
-              allowWhileIdle: true,
-            );
+            AlarmScheduler.scheduleAlarm(alarm);
             final List<AlarmItem> alarmList = ref.watch(AlarmStates.alarmsProvider);
             HiveFunctions.saveAlarmList(alarmList);
           },

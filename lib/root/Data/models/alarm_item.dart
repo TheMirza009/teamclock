@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:time_slider/root/Data/models/ringtone_model.dart';
 import 'package:time_slider/core/utilities/ringtones_class.dart';
+import 'package:time_slider/root/Data/models/weekdays_model.dart';
 import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -13,10 +14,12 @@ class AlarmItem {
   final String timezone;
   final tz.TZDateTime selectedTime;
   final Ringtone ringtone;
+  Weekday repeat;
   bool isRinging;
   bool deleteAfterRing;
   bool vibrateOnRing;
   bool isActive;
+
 
   AlarmItem({
     required this.id,
@@ -24,6 +27,7 @@ class AlarmItem {
     required this.timezone,
     required this.selectedTime,
     this.ringtone = const Ringtone(),
+    this.repeat = const Weekday(),
     this.isRinging = false,
     this.deleteAfterRing = false,
     this.vibrateOnRing = false,

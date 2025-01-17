@@ -138,25 +138,25 @@ class _TestScreenState extends ConsumerState<TestScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                var alarms = ref.watch(AlarmStates.alarmsProvider);
-                if (alarms.isNotEmpty) {
-                  final AlarmItem alarm = alarms[0]; 
-                  final selectedTime = alarm.selectedTime.toUtc();
-                  await AndroidAlarmManager.oneShotAt(
-                    selectedTime,
-                    alarm.id,
-                    AlarmRing.alarmCallback,
-                    params: alarm.toJson(),
+                // var alarms = ref.watch(AlarmStates.alarmsProvider);
+                // if (alarms.isNotEmpty) {
+                //   final AlarmItem alarm = alarms[0]; 
+                //   final selectedTime = alarm.selectedTime.toUtc();
+                //   await AndroidAlarmManager.oneShotAt(
+                //     selectedTime,
+                //     alarm.id,
+                //     AlarmRing.alarmCallback,
+                //     params: alarm.toJson(),
                       
-                    exact: true,
-                    alarmClock: true,
-                    wakeup: true,
-                    allowWhileIdle: true,
-                  );
-                  print("Android Alarm Manager called for \n>>Title: ${alarm.title}\n>>Timezone: ${alarm.timezone}\n>>Time: ${alarm.selectedTime.hour}:${alarm.selectedTime.minute}");
-                } else {
-                  print("No alarms available to trigger.");
-                }
+                //     exact: true,
+                //     alarmClock: true,
+                //     wakeup: true,
+                //     allowWhileIdle: true,
+                //   );
+                //   print("Android Alarm Manager called for \n>>Title: ${alarm.title}\n>>Timezone: ${alarm.timezone}\n>>Time: ${alarm.selectedTime.hour}:${alarm.selectedTime.minute}");
+                // } else {
+                //   print("No alarms available to trigger.");
+                // }
               },
               child: const Text("Test Print"),
             ),
