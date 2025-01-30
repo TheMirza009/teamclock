@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_states.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 

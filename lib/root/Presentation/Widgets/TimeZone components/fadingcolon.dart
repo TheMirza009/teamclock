@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/core/base/animations/fading_animation_notifier.dart';
+import 'package:teamclock/core/base/animations/fading_animation_notifier.dart';
 
 class FadingWidget extends ConsumerWidget {
   final Widget? child;

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
 
 class TextDialogueCupertino extends StatelessWidget {
   final WidgetRef ref;

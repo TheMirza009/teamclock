@@ -1,17 +1,19 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
-import 'package:time_slider/core/theme/theme_provider_class.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/homescreen.dart';
+import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/core/theme/theme_provider_class.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/homescreen.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetbinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetbinding);
   tz.initializeTimeZones();
   await Hive.initFlutter();
   await Hive.openBox("timezones");
@@ -45,6 +47,16 @@ class _MyAppState extends State<MyApp> {
   // 4 = Tasklist
   // 5 = Alarms
   // 6 = Settings
+
+  @override
+  initState() {
+    endSplash();
+  }
+
+  void endSplash() async {
+    await Future.delayed(const Duration(seconds: 1));
+    FlutterNativeSplash.remove();
+  }
 
   @override
   Widget build(BuildContext context) {

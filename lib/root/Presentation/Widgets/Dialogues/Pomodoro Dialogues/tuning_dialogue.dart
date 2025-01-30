@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
 
 class TuningDialogue extends ConsumerWidget {
   const TuningDialogue({super.key});

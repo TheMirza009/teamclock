@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
-import 'package:time_slider/core/utilities/ringtones_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_states.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/core/utilities/ringtones_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -86,69 +86,37 @@ class HiveFunctions {
   //? SAVE ALARM FUNCTIONS
   static Future<void> saveAlarmList(List<AlarmItem> alarmList) async {
 
-    // Serialize AlarmItem list to JSON for saving
-    List<Map<String, dynamic>> jsonList = alarmList.map((alarm) {
-      return {
-        'id': alarm.id,
-        'title': alarm.title,
-        'timezone': alarm.timezone,
-        'selectedTime': alarm.selectedTime.toString(),
-        'ringtone': {
-          'path': alarm.ringtone.path,
-          'loop': alarm.ringtone.loop.index, // Save loop mode as an integer (index)
-        },
-        'isRinging': alarm.isRinging,
-        'isActive': alarm.isActive,
-      };
-    }).toList();
+    // JSON serialization
+    List<Map<String, dynamic>> jsonList = alarmList.map((alarm) => alarm.toJson()).toList();
 
     // Save the JSON-encoded list to storage
     await saveData(key: 5, value: jsonEncode(jsonList));
-      print("Alarms saved:");
-    for ( var alarm in jsonList) {
+    print("Alarms saved:");
+    for (var alarm in jsonList) {
       print("Title: ${alarm['title']}, Timezone: ${alarm['timezone']}, Time: ${alarm['selectedTime']}");
     }
   }
 
   static Future<void> loadAlarms(WidgetRef ref) async {
     try {
-      // Read the stored data
       var storedValue = await readData(key: 5);
 
       if (storedValue != null) {
-        // Decode the JSON data into a list of maps
         List<dynamic> jsonList = jsonDecode(storedValue);
-
-        // Deserialize JSON into AlarmItem objects
-        List<AlarmItem> alarmList = jsonList.map((json) {
-          final timezone = json['timezone'];
-          final selectedTimeString = json['selectedTime'];
-          final loadedSelectedTime = tz.TZDateTime.parse(
-            tz.getLocation(timezone),
-            selectedTimeString,
-          );
-
-          return AlarmItem(
-            id: json['id'],
-            title: json['title'],
-            timezone: timezone,
-            selectedTime: loadedSelectedTime,
-            isRinging: json['isRinging'] ?? false,
-            isActive: json['isActive'] ?? true,
-          );
-        }).toList();
+        List<AlarmItem> alarmList = jsonList.map((json) => AlarmItem.fromJson(json)).toList();
 
         // Update the provider with the loaded alarms
         ref.read(AlarmStates.alarmsProvider.notifier).state = alarmList;
-        print("Title: ${alarmList}, Timezone: ${alarmList}");
+        print("Alarms loaded:");
+        for (var alarm in alarmList) {
+          print( "Title: ${alarm.title}, Timezone: ${alarm.timezone}, Time: ${alarm.selectedTime}");
+        }
       } else {
         // If no data is stored, set an empty list
         ref.read(AlarmStates.alarmsProvider.notifier).state = [];
       }
     } catch (e, stackTrace) {
-      // Log or handle any errors
       print('Error loading alarms: $e\n$stackTrace');
-      // Default to an empty list in case of an error
       ref.read(AlarmStates.alarmsProvider.notifier).state = [];
     }
   }

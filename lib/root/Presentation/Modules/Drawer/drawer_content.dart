@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
 
 class DrawerContent extends StatelessWidget {
   final Function(ThemeMode)? onThemeChanged;

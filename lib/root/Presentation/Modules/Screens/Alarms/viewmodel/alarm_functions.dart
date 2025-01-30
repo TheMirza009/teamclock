@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:time_slider/core/base/controllers/alarm_scheduler.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_add_alarm_screen.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:teamclock/core/base/controllers/alarm_scheduler.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_add_alarm_screen.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Data/models/ringtone_model.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
+import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Data/models/ringtone_model.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart';
 
@@ -157,6 +158,10 @@ class AlarmFunctions {
       return "${difference.inMinutes} minute and ${difference.inSeconds % 60} seconds remain.";
   }
 
+  if (difference.inSeconds == 0) {
+    return "Alarm ringing!"; 
+  }
+
   // Extract hours and minutes
   final hours = difference.inHours;
   final minutes = difference.inMinutes % 60;
@@ -225,6 +230,7 @@ static void triggerAlarms(WidgetRef ref) async {
                 timezone: alarm.timezone,
                 selectedTime: alarm.selectedTime,
                 ringtone: alarm.ringtone,
+                repeat: alarm.repeat,
                 deleteAfterRing: alarm.deleteAfterRing,
                 vibrateOnRing: alarm.vibrateOnRing,
               ),
@@ -238,9 +244,15 @@ static void triggerAlarms(WidgetRef ref) async {
     );
   }
 
+  static void printCurrentTime() {
+    DateTime currentTime = DateTime.now();
+    String formattedTime = TimezoneFunctions.formatTimeFromDateTime(currentTime);
+    print(formattedTime);
+  }
+
   // Add Alarm Function
   static Future<void> editAlarm(BuildContext context, WidgetRef ref, AlarmItem existingAlarm) async {
-    print((DateTime.now().hour % 12));
+    printCurrentTime();
     showCupertinoModalPopup(
       context: context,
       builder: (context) {

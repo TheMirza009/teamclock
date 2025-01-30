@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
 
   final FocusNode _focusNode = FocusNode();
 class NewTaskDialogue extends StatelessWidget {

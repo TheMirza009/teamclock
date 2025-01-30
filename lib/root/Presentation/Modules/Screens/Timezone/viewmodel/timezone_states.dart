@@ -1,5 +1,5 @@
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
 
 class TimezoneStates {
   static bool isLoading = false;

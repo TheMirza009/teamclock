@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_countdown_widget.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Segmented%20Control/pomodoro_segmented_control.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_button_row.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';  // Import your provider file
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_countdown_widget.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Segmented%20Control/pomodoro_segmented_control.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Main%20Stateful%20Version/pomodoro_button_row.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';  // Import your provider file
 
 class PomodoroWidget extends StatefulWidget {
   const PomodoroWidget({super.key});

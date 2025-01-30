@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/duration_picker_dialog.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/duration_picker_dialog.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
 
 class TuningDialogueIOS extends ConsumerWidget {
   const TuningDialogueIOS({super.key});

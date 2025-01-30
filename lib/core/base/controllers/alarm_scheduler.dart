@@ -1,26 +1,30 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Data/models/weekdays_model.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Data/models/weekdays_model.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AlarmScheduler {
 
   // Main function
-  static void scheduleAlarm(AlarmItem alarm) {
+  static Future<void> scheduleAlarm(AlarmItem alarm) async {
+    print("ALARM SCHEDULED for: ${alarm.id}");
     if (alarm.repeat == Weekday.none()) {
-      _oneShot(alarm);  // One-shot alarm
+      print("Alarm: ONE-SHOT "); // Single shot if no repition
+      await _oneShot(alarm);
     } else {
+      print("Alarm: PERIODIC");
       _schedulePeriodicAlarms(alarm); // Periodic Alarm for days
     }
   }
 
   // Only Rings once | No repitition
-  static void _oneShot(AlarmItem alarm) async {
+  static Future<void> _oneShot(AlarmItem alarm) async {
     await AndroidAlarmManager.oneShotAt(
       alarm.selectedTime,
       alarm.id,
       AlarmRing.alarmCallback,
+      params: alarm.toJson(),
       exact: true,
       wakeup: true,
       allowWhileIdle: true,
@@ -64,6 +68,7 @@ class AlarmScheduler {
       const Duration(days: 7), // Weekly repetition
       alarm.id + weekday, // Unique ID for each weekday alarm
       AlarmRing.alarmCallback,
+      params: alarm.toJson(),
       startAt: scheduledTime,
       exact: true,
       wakeup: true,

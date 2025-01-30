@@ -7,24 +7,20 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Data/models/ringtone_model.dart';
-import 'package:time_slider/core/utilities/ringtones_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Settings/settings_states.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/ringtone_selection_dialog.dart';
-import 'package:time_slider/root/Presentation/Widgets/custom_list_tile.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Data/models/ringtone_model.dart';
+import 'package:teamclock/core/utilities/ringtones_class.dart';
+import 'package:teamclock/root/Data/models/weekdays_model.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/ringtone_selection_dialog.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/weekday_selection_dialog.dart';
+import 'package:teamclock/root/Presentation/Widgets/custom_list_tile.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
 import 'package:timezone/timezone.dart' as tz;
-
-// Trigger test
-void triggerTest(WidgetRef ref) {
-    print("Function 2 called........");
-    AlarmFunctions.triggerAlarms(ref);
-}
 
 // DEFAULT VALUES DECLARATIONS
 final _currentTime = tz.TZDateTime.now(tz.getLocation(TimezoneStates.localTimezoneGlobal));
@@ -61,11 +57,6 @@ class AddAlarmScreen extends ConsumerStatefulWidget {
 
 class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
- void triggerAlarmCallback() {
-    print("Function 1 called........");
-    AlarmFunctions.triggerAlarms(ref);
-  }
-
   // DECLARATIONS
   late int selectedAmPmIndex; // 0 for AM, 1 for PM
   late int selectedHourIndex;
@@ -74,6 +65,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
   late bool deleteAfterRing;
   String selectedTimezone = TimezoneStates.localTimezoneGlobal;
   late String ringtonePath;
+  late Weekday weekdays;
   late LoopMode ringtoneLoopMode;
   String alarmTitle = "Alarm";
 
@@ -109,6 +101,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
         path: Ringtones.defaultRingtone,
         loop: LoopMode.one,
       ),
+      repeat: Weekday.none()
     );
 
     // Determine the alarm to use, either from widget or default
@@ -123,6 +116,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
     selectedTimezone = widget.existingAlarm != null ? alarm.timezone : selectedTimezone;
     ringtonePath = alarm.ringtone.path;
     ringtoneLoopMode = alarm.ringtone.loop;
+    weekdays = alarm.repeat;
     alarmTitle = alarm.title;
   }
 
@@ -239,15 +233,6 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                     tz.TZDateTime parsedTime = tz.TZDateTime.parse(tz.getLocation(selectedTimezone), selectedTime.toString());
                     final int uniqueID = DateTime.now().millisecondsSinceEpoch % 1000000;
                     final ringtone = Ringtone(path: ringtonePath, loop: ringtoneLoopMode );
-                    
-                    // Android Alarm Manager state
-                    await AndroidAlarmManager.oneShotAt(
-                      parsedTime, 
-                      uniqueID, 
-                      triggerAlarmCallback,
-                      exact: true,
-                      wakeup: true,
-                      );
 
                     print("New Alarm set with the following parametres. \nTitle: $alarmTitle\nSelected Timezone: $selectedTimezone\nSelected Time: ${selectedTime?.hour} : ${selectedTime?.minute}");
 
@@ -258,6 +243,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                         timezone: selectedTimezone,
                         selectedTime: parsedTime,
                         ringtone: ringtone,
+                        repeat: weekdays,
                         deleteAfterRing: deleteAfterRing,
                         vibrateOnRing: vibrateOnRing,
                       );
@@ -358,18 +344,38 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                 ),
 
                 // RINGTONE Option
+                // CustomListTile(
+                //   title: "Ringtone",
+                //   subtitle:  Ringtones.extractTitle(ringtonePath),
+                //   onTap: () => showDialog(
+                //     context: context,
+                //     builder: (context) {
+                //       return RingtoneSelectionDialog(
+                //         onRingtoneSelected: (selectedRingtone) {
+                //           setState(() {
+                //             ringtonePath = selectedRingtone;
+                //           });
+                //           print("Selected Ringtone: $selectedRingtone");
+                //         },
+                //       );
+                //     },
+                //   ),
+                // ),
+
+                // WEEKDAY SELECTION
                 CustomListTile(
-                  title: "Ringtone",
-                  subtitle:  Ringtones.extractTitle(ringtonePath),
+                  title: "Repeat",
+                  subtitle:  Weekday.countTrueDays(weekdays),
                   onTap: () => showDialog(
                     context: context,
                     builder: (context) {
-                      return RingtoneSelectionDialog(
-                        onRingtoneSelected: (selectedRingtone) {
+                      return WeekdaySelectionDialog(
+                        existingWeekdays: weekdays,
+                        onWeekdaysSelected: (updatedWeekdays) {
                           setState(() {
-                            ringtonePath = selectedRingtone;
+                            weekdays = updatedWeekdays;
                           });
-                          print("Selected Ringtone: $selectedRingtone");
+                          print("Selected Ringtone: $weekdays");
                         },
                       );
                     },
@@ -378,7 +384,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
 
                 // REPEAT Menu
                 CustomListTile(
-                  title: "Repeat",
+                  title: "Ring",
                   subtitle: ringtoneLoopMode == LoopMode.off ? "Once" : "Loop",
                   onTapDown: (details) => showLoopModeMenu(details),
                 ),

@@ -5,21 +5,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
-import 'package:time_slider/root/Data/models/alarm_item.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
-import 'package:time_slider/core/base/controllers/port_controller.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/testscreen.dart';
-import 'package:time_slider/root/Presentation/Widgets/Alarm%20Components/alarm_card.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawerIcon.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
-import 'package:time_slider/root/Presentation/Widgets/svgIcon.dart';
+import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawer_content.dart';
+import 'package:teamclock/core/base/controllers/port_controller.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/testscreen.dart';
+import 'package:teamclock/root/Presentation/Widgets/Alarm%20Components/alarm_card.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawerIcon.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
+import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:vibration/vibration.dart';
@@ -126,7 +126,9 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
       centerTitle: true,
-      title: ThemeConstants.pageTitle(context, "Alarms"), 
+      title: GestureDetector(
+        onTap: () => alarms.forEach((alarm) => print(alarm.toJson())),
+        child: ThemeConstants.pageTitle(context, "Alarms")), 
       leading: IconButton(
         onPressed: () => cupertinoSimpleDialogue(
           context: context,

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:time_slider/root/Data/models/ringtone_model.dart';
-import 'package:time_slider/core/utilities/ringtones_class.dart';
-import 'package:time_slider/root/Data/models/weekdays_model.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
+import 'package:teamclock/root/Data/models/ringtone_model.dart';
+import 'package:teamclock/core/utilities/ringtones_class.dart';
+import 'package:teamclock/root/Data/models/weekdays_model.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -57,6 +57,7 @@ class AlarmItem {
     // Parsing selectedTime into TZDateTime
     final selectedTime = tz.TZDateTime.parse(tz.getLocation(json['timezone']), json['selectedTime']);
     final ringtone = Ringtone.fromJson(json['ringtone']);  // Assuming Ringtone has a fromJson method
+    final Weekday weekdays = Weekday.fromJson(json['repeat']);
 
     return AlarmItem(
       id: json['id'],
@@ -64,20 +65,21 @@ class AlarmItem {
       timezone: json['timezone'],
       selectedTime: selectedTime,
       ringtone: ringtone,
+      repeat: weekdays,
       isActive: json['isActive'],
       vibrateOnRing: json['vibrateOnRing'],
       isRinging: json['isRinging'],
     );
   }
 
-  // Optionally, you can also define a toJson method if you need to serialize objects
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'timezone': timezone,
       'selectedTime': selectedTime.toIso8601String(),  // Convert TZDateTime to ISO string
-      'ringtone': ringtone.toJson(),  // Assuming Ringtone has a toJson method
+      'ringtone': ringtone.toJson(),  // Ringtone toJson method
+      'repeat': repeat.toJson(),
       'isActive': isActive,
       'vibrateOnRing': vibrateOnRing,
       'isRinging': isRinging,

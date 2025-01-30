@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:time_slider/core/base/controllers/hive_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawerIcon.dart';
-import 'package:time_slider/root/Presentation/Widgets/TimeZone%20components/timezone_ui.dart';
-import 'package:time_slider/root/Presentation/Widgets/TimeZone%20components/timezoneminiwidget.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/svgIcon.dart';
+import 'package:teamclock/core/base/controllers/hive_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawer_content.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/Timezone%20Dialogues/addtimezone_dialog.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/themeselection_dialog_ios.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawerIcon.dart';
+import 'package:teamclock/root/Presentation/Widgets/TimeZone%20components/timezone_ui.dart';
+import 'package:teamclock/root/Presentation/Widgets/TimeZone%20components/timezoneminiwidget.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 
 class TimezonesScreen extends StatefulWidget {
   const TimezonesScreen({

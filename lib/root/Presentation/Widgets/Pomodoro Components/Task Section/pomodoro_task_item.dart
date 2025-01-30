@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
 
 class TaskItem extends StatelessWidget {
   final String text;

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
 
 // TimerNotifier manages the countdown timer
 class PomodoroTimerNotifier extends StateNotifier<int> {

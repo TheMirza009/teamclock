@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawer_content.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/new_task_dialogue_ios.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Main%20Riverpod%20Version/pomodoro_widget_riverpod.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Task%20Section/pomodoro_tasklist.dart';
-import 'package:time_slider/root/Presentation/Modules/Drawer/drawerIcon.dart';
-import 'package:time_slider/root/Presentation/Widgets/svgIcon.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawer_content.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/new_task_dialogue_ios.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Main%20Riverpod%20Version/pomodoro_widget_riverpod.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Task%20Section/pomodoro_tasklist.dart';
+import 'package:teamclock/root/Presentation/Modules/Drawer/drawerIcon.dart';
+import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 
 class PomodoroScreen extends ConsumerWidget {
   const PomodoroScreen({super.key});

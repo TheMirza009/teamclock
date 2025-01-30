@@ -1,4 +1,4 @@
-package com.example.time_slider
+package com.team.teamclock
 
 import io.flutter.embedding.android.FlutterActivity
 

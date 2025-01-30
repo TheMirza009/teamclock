@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/TimeZone%20components/currenttimegetter.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/TimeZone%20components/currenttimegetter.dart';
 
 class TimeZoneMiniWidget extends StatelessWidget {
   final int dynamicMinutes;

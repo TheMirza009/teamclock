@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:time_slider/core/utilities/ringtones_class.dart';
+import 'package:teamclock/core/utilities/ringtones_class.dart';
 
 class Ringtone {
 

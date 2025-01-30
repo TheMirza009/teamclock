@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/core/base/dependency_classes/app_lifecycle_provider.dart';
-import 'package:time_slider/core/base/controllers/notification_controller.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:teamclock/core/base/dependency_classes/app_lifecycle_provider.dart';
+import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
 import '../../../../../../core/base/dependency_classes/app_lifecycle_provider.dart';
 
 class PomodoroFunctions {

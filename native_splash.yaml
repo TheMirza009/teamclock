@@ -1,0 +1,22 @@
+flutter_native_splash:
+  android: true
+  ios: false
+  web: false
+
+  # Light mode configuration
+  color: "#cccccc" # Light mode background color
+  image: "Assets/icons/teamclock_logo_final_light.png"
+  branding: "Assets/icons/teamclock_logo_final_branding_light.png"
+
+  # Dark mode configuration
+  color_dark: "#081118" # Dark mode background color
+  image_dark: "Assets/icons/teamclock_logo_final_dark.png"
+  branding_dark: "Assets/icons/teamclock_logo_final_branding_dark.png"
+
+  android_12:
+    color: "#cccccc"
+    color_dark: "#081118"
+    image: "Assets/icons/teamclock_logo_final_light.png"
+    image_dark: "Assets/icons/teamclock_logo_final_dark.png"
+    branding: "Assets/icons/teamclock_logo_final_branding_light.png"
+    branding_dark: "Assets/icons/teamclock_logo_final_branding_dark.png"

@@ -1,4 +1,4 @@
-# time_slider
+# teamclock
 
 A new Flutter project.
 

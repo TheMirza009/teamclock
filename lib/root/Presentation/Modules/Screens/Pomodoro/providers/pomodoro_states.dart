@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_timer_provider.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/time_durations_notifier.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_timer_provider.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/time_durations_notifier.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
 
 // Define additional state providers
 class PomodoroStates {

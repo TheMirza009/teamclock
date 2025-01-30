@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
-import 'package:time_slider/core/theme/theme_constants.dart';
-import 'package:time_slider/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/new_task_dialogue_ios.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Segmented%20Control/pomodoro_task_tab_control.dart';
-import 'package:time_slider/root/Presentation/Widgets/Pomodoro%20Components/Task%20Section/pomodoro_task_item.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
-import 'package:time_slider/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/new_task_dialogue_ios.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Segmented%20Control/pomodoro_task_tab_control.dart';
+import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Task%20Section/pomodoro_task_item.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/pomodoro_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
 
 class PomodoroTaskList extends ConsumerWidget {
   const PomodoroTaskList({super.key});
