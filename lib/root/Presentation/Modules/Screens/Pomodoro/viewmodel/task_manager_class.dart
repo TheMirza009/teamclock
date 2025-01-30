@@ -23,27 +23,37 @@ class TaskManager {
   }
 
   /// Loads tasks from Hive and updates Riverpod providers
-  Future<void> loadTasks() async {
+Future<void> loadTasks() async {
   final box = await Hive.openBox(_boxName);
+
   if (box.containsKey(_key)) {
     final loadedTasks = box.get(_key) as List<dynamic>;
+
     if (loadedTasks.length == 2) {
-      // Safely check if the elements are maps and cast them to the proper type
-      ref.read(PomodoroStates.pendingTasksProvider.notifier).state = List<Map<String, dynamic>>.from(
-        loadedTasks[0]?.map((task) => Map<String, dynamic>.from(task)) ?? [],
+      // Filter tasks based on the value of 'task["value"]'
+      final pendingTasks = List<Map<String, dynamic>>.from(
+        loadedTasks[0]?.where((task) => task['value'] == false).map((task) => Map<String, dynamic>.from(task)) ?? [],
       );
-      ref.read(PomodoroStates.completedTasksProvider.notifier).state = List<Map<String, dynamic>>.from(
-        loadedTasks[1]?.map((task) => Map<String, dynamic>.from(task)) ?? [],
+
+      final completedTasks = List<Map<String, dynamic>>.from(
+        loadedTasks[1]?.where((task) => task['value'] == true).map((task) => Map<String, dynamic>.from(task)) ?? [],
       );
+
+      ref.read(PomodoroStates.pendingTasksProvider.notifier).state = pendingTasks;
+      ref.read(PomodoroStates.completedTasksProvider.notifier).state = completedTasks;
     } else {
-      ref.read(PomodoroStates.pendingTasksProvider.notifier).state = [];
-      ref.read(PomodoroStates.completedTasksProvider.notifier).state = [];
+      _resetTaskProviders();
     }
   } else {
-    ref.read(PomodoroStates.pendingTasksProvider.notifier).state = [];
-    ref.read(PomodoroStates.completedTasksProvider.notifier).state = [];
+    _resetTaskProviders();
   }
 }
+
+void _resetTaskProviders() {
+  ref.read(PomodoroStates.pendingTasksProvider.notifier).state = [];
+  ref.read(PomodoroStates.completedTasksProvider.notifier).state = [];
+}
+
 
   /// Clears tasks from Hive and Riverpod providers
   Future<void> clearTasks() async {

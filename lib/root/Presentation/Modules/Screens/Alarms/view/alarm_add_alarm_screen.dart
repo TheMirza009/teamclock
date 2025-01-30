@@ -314,9 +314,10 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
             const SizedBox(height: 20),
 
             // OPTIONS COLUMN
-            Column(
+            ListView(
+              shrinkWrap: true,
               children: [
-
+            
                 // TITLE Option
                 CustomListTile(
                   title: "Title",
@@ -324,7 +325,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                   noTitle: noTitle,
                   onTap: () => _editTitle(context),
                 ),
-
+            
                 // TIMEZONE Option
                 CustomListTile(
                   title: "Timezone",
@@ -342,7 +343,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                     },
                   ),
                 ),
-
+            
                 // RINGTONE Option
                 // CustomListTile(
                 //   title: "Ringtone",
@@ -361,7 +362,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                 //     },
                 //   ),
                 // ),
-
+            
                 // WEEKDAY SELECTION
                 CustomListTile(
                   title: "Repeat",
@@ -381,14 +382,14 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                     },
                   ),
                 ),
-
+            
                 // REPEAT Menu
                 CustomListTile(
                   title: "Ring",
                   subtitle: ringtoneLoopMode == LoopMode.off ? "Once" : "Loop",
                   onTapDown: (details) => showLoopModeMenu(details),
                 ),
-
+            
                 // VIBRATE option
                 CustomListTile(
                   title: "Vibrate on ring",
@@ -402,7 +403,7 @@ class _AddAlarmScreenState extends ConsumerState<AddAlarmScreen> {
                       });
                     }),
                 ),
-
+            
                 // DELETE option
                 CustomListTile(
                   title: "Delete after ring",

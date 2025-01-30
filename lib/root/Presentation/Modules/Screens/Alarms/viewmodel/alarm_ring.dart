@@ -32,6 +32,7 @@ class AlarmRing {
   }
 
   // Stop Ringtone
+  @pragma("vm:entry-point")
   static Future<void> stopAlarmCallback(int alarmID) async {
     _vibrationTimer?.cancel();
     await player.stop();

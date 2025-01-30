@@ -215,6 +215,7 @@ class NotificationController {
         if (receivedAction.buttonKeyPressed == "reset") {
           print(receivedAction.title);
           ref.read(timerNotifierProvider.notifier).pause();
+          ref.read(PomodoroStates.segmentedControlValue.notifier).state = 0;
           ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier).resetAllTimers();
           ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
         }
