@@ -3,6 +3,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:teamclock/core/base/controllers/port_controller.dart';
 import 'package:teamclock/root/Data/models/alarm_item.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
@@ -243,25 +244,46 @@ class NotificationController {
       }
 
       // Handle stop alarm method
-      if (receivedAction.payload?['alarmId'] != null) {
-        final alarmId = int.tryParse(receivedAction.payload!['alarmId']!);
-        if (alarmId == null) {
-          print('Invalid alarm ID in notification payload.');
-          return;
-        }
+        if (receivedAction.buttonKeyPressed == "stopalarm") {
+          print(receivedAction.title);
 
-        // get alarm from payload
-        final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
+          final alarmId = int.tryParse(receivedAction.payload?['alarmId'] ?? '');
+          if (alarmId == null) {
+            print('Invalid alarm ID in notification payload.');
+            return;
+          }
 
-        if (receivedAction.buttonKeyPressed == null ||
-            receivedAction.buttonKeyPressed.isEmpty ||
-            receivedAction.buttonKeyPressed == "stopalarm") {
-          // Handle both notification press and "stopalarm" button
-          print('Stopping alarm with ID $alarmId.');
+          // Get alarm from payload via ID
+          final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
+
+          // AlarmFunctions.stopAlarm(ref, alarm);
           AlarmRing.stopAlarm(alarm.id);
           AlarmFunctions.finishAlarm(ref, alarm.id);
+          print('Alarm with ID $alarmId stopped.');
         }
-      }
-    });
+
+        if (receivedAction.payload?['alarmId'] != null ||
+            receivedAction.buttonKeyPressed == null ||
+            receivedAction.buttonKeyPressed.isEmpty) {
+          
+          // get alarm from payload
+          final alarmId = int.tryParse(receivedAction.payload?['alarmId'] ?? '');
+          final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
+          if (alarmId == null) {
+            print('Invalid alarm ID in notification payload.');
+            return;
+          }
+
+          // Set Alarm to Ringing in main isolate and Navigate to alarm list screen
+          AlarmRing.stopAlarm(alarm.id);
+          AlarmFunctions.finishAlarm(ref, alarm.id);
+          navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const AlarmListScreen()),
+            (route) => false, // Remove all previous routes
+        );
+        }
+      },
+    );
   }
 }
