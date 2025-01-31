@@ -11,6 +11,8 @@ import 'package:teamclock/core/theme/theme_constants.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/homescreen.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsBinding widgetbinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetbinding);
@@ -75,6 +77,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,
+        navigatorKey: navigatorKey,
         home: const Homescreen(),
         // home: const TimezonesScreen(),
       );

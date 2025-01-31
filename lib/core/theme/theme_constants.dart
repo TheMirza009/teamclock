@@ -101,7 +101,7 @@ class ThemeConstants {
         ),
 
         scrollbarTheme: ScrollbarThemeData(
-          thumbColor: MaterialStateProperty.all(darkTitle.withOpacity(0.2)), // 20% transparency of the primary color
+          thumbColor: WidgetStateProperty.all(darkTitle.withOpacity(0.2)), // 20% transparency of the primary color
         ),
 
         // ANDROID TIME PICKER THEME
@@ -152,7 +152,7 @@ class ThemeConstants {
         // ),
 
         scrollbarTheme: ScrollbarThemeData(
-          thumbColor: MaterialStateProperty.all(lightTitle.withOpacity(0.2)), // 20% transparency of the primary color
+          thumbColor: WidgetStateProperty.all(lightTitle.withOpacity(0.2)), // 20% transparency of the primary color
         ),
 
         sliderTheme: SliderThemeData(

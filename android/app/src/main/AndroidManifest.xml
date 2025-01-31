@@ -7,7 +7,12 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <application android:label="Teamclock" android:name="${applicationName}" android:icon="@mipmap/launcher_icon">
+
+    <!-- NAME AND ICON -->
+    <application 
+        android:label="Teamclock" 
+        android:name="${applicationName}" 
+        android:icon="@mipmap/launcher_icon">
 
         <service android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="false"/>
         <receiver android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver" android:exported="false"/>

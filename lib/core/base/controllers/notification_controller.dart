@@ -1,8 +1,10 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:teamclock/root/Data/models/alarm_item.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
@@ -14,7 +16,7 @@ class NotificationController {
   static Future<void> initializeNotification() async {
     // Initialize the notification system
     AwesomeNotifications().initialize(
-       null,
+       'resource://drawable/notification_icon',
       [
         NotificationChannel(
           channelKey: 'high_importance_channel',
@@ -50,18 +52,20 @@ class NotificationController {
   }
 
   /// Use this method to detect when the user taps on a notification or action button
-  // @pragma("vm:entry-point")
-  // static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-  //   // Your code goes here
-
-  //   // Navigate into pages, avoiding to open the notification details page over another details page already opened
-  //   MyApp.navigatorKey.currentState?.pushNamedAndRemoveUntil('/notification-page',
-  //           (route) => (route.settings.name != '/notification-page') || route.isFirst,
-  //       arguments: receivedAction);
-  // }
+  @pragma("vm:entry-point")
+  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+    print("ACTION RECEIEVED: ${receivedAction.payload}");
+    
+    // Navigate into pages, avoiding to open the notification details page over another details page already opened
+    // navigatorKey.currentState?.pushAndRemoveUntil(
+    //   MaterialPageRoute(
+    //     builder: (context) => const AlarmListScreen(),
+    //   ),
+    //   (route) => false, // Remove all previous routes
+    // );
+  }
 
   // POMODORO NOTIFICATIONS
-
   static void showPomodoroNotificationOnStart(WidgetRef ref) {
     AwesomeNotifications().createNotification(
       content: NotificationContent(
@@ -207,52 +211,57 @@ class NotificationController {
     // Set up notification listeners
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: (receivedAction) async {
-        if (receivedAction.buttonKeyPressed == "pause") {
-          print(receivedAction.title);
-          ref.read(timerNotifierProvider.notifier).pause();
+      // print("ACTION RECEIEVD: ${receivedAction}");
+
+      // POMODORO Pause method
+      if (receivedAction.buttonKeyPressed == "pause") {
+        print(receivedAction.title);
+        ref.read(timerNotifierProvider.notifier).pause();
+      }
+
+      // POMODORO Reset method
+      if (receivedAction.buttonKeyPressed == "reset") {
+        print(receivedAction.title);
+        ref.read(timerNotifierProvider.notifier).pause();
+        ref.read(PomodoroStates.segmentedControlValue.notifier).state = 0;
+        ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier).resetAllTimers();
+        ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
+      }
+
+      // POMODORO Break method
+      if (receivedAction.buttonKeyPressed == "break") {
+        print(receivedAction.title);
+        pomodoroBreak(ref: ref, index: 1);
+        ref.read(timerNotifierProvider.notifier).reset();
+      }
+
+      // POMODORO Long-Break method
+      if (receivedAction.buttonKeyPressed == "longbreak") {
+        print(receivedAction.title);
+        pomodoroBreak(ref: ref, index: 2);
+        ref.read(timerNotifierProvider.notifier).reset();
+      }
+
+      // Handle stop alarm method
+      if (receivedAction.payload?['alarmId'] != null) {
+        final alarmId = int.tryParse(receivedAction.payload!['alarmId']!);
+        if (alarmId == null) {
+          print('Invalid alarm ID in notification payload.');
+          return;
         }
 
-        if (receivedAction.buttonKeyPressed == "reset") {
-          print(receivedAction.title);
-          ref.read(timerNotifierProvider.notifier).pause();
-          ref.read(PomodoroStates.segmentedControlValue.notifier).state = 0;
-          ref.read(PomodoroStates.timerDurationsNotifierProvider.notifier).resetAllTimers();
-          ref.read(PomodoroStates.isPlayingProvider.notifier).state = false;
+        // get alarm from payload
+        final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
+
+        if (receivedAction.buttonKeyPressed == null ||
+            receivedAction.buttonKeyPressed.isEmpty ||
+            receivedAction.buttonKeyPressed == "stopalarm") {
+          // Handle both notification press and "stopalarm" button
+          print('Stopping alarm with ID $alarmId.');
+          AlarmRing.stopAlarm(alarm.id);
+          AlarmFunctions.finishAlarm(ref, alarm.id);
         }
-
-        if (receivedAction.buttonKeyPressed == "break") {
-          print(receivedAction.title);
-          pomodoroBreak(ref: ref, index: 1);
-          ref.read(timerNotifierProvider.notifier).reset();
-        }
-
-        if (receivedAction.buttonKeyPressed == "longbreak") {
-          print(receivedAction.title);
-          pomodoroBreak(ref: ref, index: 2);
-          ref.read(timerNotifierProvider.notifier).reset();
-        }
-
-        if (receivedAction.buttonKeyPressed == "stopalarm") {
-          print(receivedAction.title);
-
-          final alarmId = int.tryParse(receivedAction.payload?['alarmId'] ?? '');
-          if (alarmId == null) {
-            print('Invalid alarm ID in notification payload.');
-            return;
-          }
-
-          final alarm = ref.watch(AlarmStates.alarmsProvider).firstWhere((alarm) => alarm.id == alarmId);
-
-          if (alarm != null) {
-            // AlarmFunctions.stopAlarm(ref, alarm);
-            AlarmRing.stopAlarm(alarm.id);
-            AlarmFunctions.finishAlarm(ref, alarm.id);
-            print('Alarm with ID $alarmId stopped.');
-          } else {
-            print('Alarm with ID $alarmId not found.');
-          }
-        }
-      },
-    );
+      }
+    });
   }
 }
