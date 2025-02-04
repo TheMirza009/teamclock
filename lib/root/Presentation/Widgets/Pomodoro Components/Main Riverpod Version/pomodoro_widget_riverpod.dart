@@ -1,12 +1,7 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:teamclock/core/base/dependency_classes/app_lifecycle_provider.dart';
-import 'package:teamclock/core/base/controllers/notification_controller.dart';
-import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
-import 'package:teamclock/core/base/controllers/hive_class.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
 import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/tuning_dialogue_ios.dart';

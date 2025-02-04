@@ -7,7 +7,7 @@ class TimeZoneWidget extends StatefulWidget {
   final String timezone;
   // final int dynamicMinutes;
   // int counter;
-  TimeZoneWidget({
+  const TimeZoneWidget({
     super.key,
     required this.timezone,
     // required this.dynamicMinutes,

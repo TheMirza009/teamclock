@@ -37,7 +37,7 @@ class _TimeZoneMainUIState extends ConsumerState<TimeZoneMainUI> {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
       });
     });

@@ -8,7 +8,6 @@ import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogu
 import 'package:teamclock/root/Presentation/Widgets/Dialogues/simple_cupertino_dialogue.dart';
 import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Main%20Riverpod%20Version/pomodoro_widget_riverpod.dart';
 import 'package:teamclock/root/Presentation/Widgets/Pomodoro%20Components/Task%20Section/pomodoro_tasklist.dart';
-import 'package:teamclock/root/Presentation/Modules/Drawer/drawerIcon.dart';
 import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 
 class PomodoroScreen extends ConsumerWidget {

@@ -5,11 +5,10 @@ import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_li
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
-import 'package:teamclock/root/Presentation/Modules/Screens/port_test.dart';
-import 'package:teamclock/root/Presentation/Modules/Screens/testscreen.dart';
 
 class Homescreen extends StatelessWidget {
-  const Homescreen({super.key});
+  final int passedIndex;
+  const Homescreen({super.key, this.passedIndex = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +16,7 @@ class Homescreen extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       body: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
+          currentIndex: passedIndex,
           backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
           height: 60,
           iconSize: 30,

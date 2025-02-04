@@ -6,10 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:teamclock/root/Data/models/alarm_item.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
-import 'package:teamclock/core/utilities/ringtones_class.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 class HiveFunctions {
 

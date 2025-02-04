@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:teamclock/core/theme/theme_provider_class.dart';
 import 'package:teamclock/core/base/controllers/hive_class.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_screen_alarmsettings.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
 import 'package:teamclock/root/Presentation/Widgets/Dialogues/Pomodoro%20Dialogues/tuning_dialogue_ios.dart';
@@ -148,14 +149,25 @@ class SettingsScreen extends ConsumerWidget {
             // POMODORO SECONDS
             ListTile(
               title: Text("Pomodoro Settings", style: montserratBold),
+              trailing: const Icon(CupertinoIcons.right_chevron),
               onTap: () => showCupertinoModalPopup(
               context: context,
               builder: (context) => const TuningDialogueIOS())),
             greyDivider,
 
+            // ALARM SETTINGS
+            ListTile(
+              title: Text("Alarm Settings", style: montserratBold),
+              trailing: const Icon(CupertinoIcons.right_chevron),
+              onTap: () => Navigator.push(context, CupertinoPageRoute(
+              builder: (context) => AlarmSettingsPage()))
+              ),
+            greyDivider,
+
             // GRAND RESET
             ListTile(
               title: Text("Clear all data", style: montserratBold),
+              trailing: const Icon(CupertinoIcons.right_chevron),
               onTap: () => clearAllDataDialogue(context)),
             greyDivider,
           ],

@@ -12,6 +12,7 @@ import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/p
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_functions.dart';
 import 'package:teamclock/main.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_functions.dart';
+import 'package:teamclock/root/Presentation/Modules/Screens/homescreen.dart';
 
 class NotificationController {
   static Future<void> initializeNotification() async {
@@ -263,7 +264,6 @@ class NotificationController {
         }
 
         if (receivedAction.payload?['alarmId'] != null ||
-            receivedAction.buttonKeyPressed == null ||
             receivedAction.buttonKeyPressed.isEmpty) {
           
           // get alarm from payload
@@ -279,7 +279,7 @@ class NotificationController {
           AlarmFunctions.finishAlarm(ref, alarm.id);
           navigatorKey.currentState?.pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const AlarmListScreen()),
+            builder: (context) => const Homescreen(passedIndex: 2)),
             (route) => false, // Remove all previous routes
         );
         }

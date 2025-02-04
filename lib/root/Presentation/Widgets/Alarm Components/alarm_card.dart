@@ -130,7 +130,7 @@ class _AlarmCardState extends State<AlarmCard> {
                               fontSize: 12, 
                               fontWeight: FontWeight.w600,
                               ),
-                            ) : SizedBox.shrink(),
+                            ) : const SizedBox.shrink(),
                           ],
                         ),
                       ],

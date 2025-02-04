@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:teamclock/core/utilities/ringtones_class.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
 import 'package:teamclock/root/Data/models/weekdays_model.dart';
 

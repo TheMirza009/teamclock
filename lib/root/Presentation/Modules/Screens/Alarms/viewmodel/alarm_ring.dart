@@ -36,14 +36,12 @@ class AlarmRing {
   static Future<void> stopAlarmCallback(int alarmID) async {
     _vibrationTimer?.cancel();
     await player.stop();
-    if (alarmID != null) {
-      await Future.wait([
-        AndroidAlarmManager.cancel(alarmID),
-        AwesomeNotifications().cancel(alarmID),
-      ]);
-      // PortMessageController.sendMessage({"id": alarmID});
+    await Future.wait([
+      AndroidAlarmManager.cancel(alarmID),
+      AwesomeNotifications().cancel(alarmID),
+    ]);
+    // PortMessageController.sendMessage({"id": alarmID});
     }
-  }
 
   // Callback function that prints alarm details
   @pragma('vm:entry-point')

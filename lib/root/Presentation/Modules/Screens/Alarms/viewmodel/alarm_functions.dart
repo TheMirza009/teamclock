@@ -36,11 +36,9 @@ class AlarmFunctions {
   static void finishAlarm(WidgetRef ref, int alarmID) {
     List<AlarmItem> alarms = ref.read(AlarmStates.alarmsProvider);
     AlarmItem alarm = alarms.firstWhere((alarm) => alarm.id == alarmID);
-    if (alarm != null) {
-      alarm.isRinging = false;
-      if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
+    alarm.isRinging = false;
+    if (alarm.deleteAfterRing) removeAlarm(ref, alarm);
     }
-  }
 
    // if (alarm.deleteAfterRing) {
 

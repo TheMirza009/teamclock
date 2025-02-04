@@ -6,10 +6,10 @@ class CountdownWidget extends StatefulWidget {
   final bool isPlaying;
   final int timerDuration; // Duration in seconds (e.g., 1500 for 25 minutes)
   const CountdownWidget({
-    Key? key,
+    super.key,
     required this.isPlaying,
     required this.timerDuration,
-  }) : super(key: key);
+  });
 
   @override
   CountdownWidgetState createState() => CountdownWidgetState();

@@ -7,7 +7,6 @@ import 'package:teamclock/core/base/controllers/notification_controller.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/viewmodel/task_manager_class.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/providers/pomodoro_states.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
-import '../../../../../../core/base/dependency_classes/app_lifecycle_provider.dart';
 
 class PomodoroFunctions {
   static void tabShift({

@@ -37,10 +37,10 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
             selectedTime != null
                 ? "Selected Time: ${selectedTime?.hour ?? "Hour"}:${selectedTime?.minute ?? "Minute"}"
                 : "Please select an alarm time.",
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
           ),
-          SizedBox(height: 10),
-          Text("$selectedTimezone Time: $now", style: TextStyle(fontSize: 16)),
+          const SizedBox(height: 10),
+          Text("$selectedTimezone Time: $now", style: const TextStyle(fontSize: 16)),
           
           // Timezone and Alarm Time Selection
           OutlinedButton(
@@ -78,7 +78,7 @@ class _AddTimezoneDialogTestState extends State<AddTimezoneDialogTest> {
             },
             child: Text('Pick Alarm Time', style: ThemeConstants.notBoldText(context)),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           
           // Error Message if fields are empty
           isEmpty

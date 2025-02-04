@@ -1,10 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:teamclock/root/Data/models/ringtone_model.dart';
 import 'package:teamclock/core/utilities/ringtones_class.dart';
 import 'package:teamclock/root/Data/models/weekdays_model.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/viewmodel/timezone_states.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 // Alarm Item Model

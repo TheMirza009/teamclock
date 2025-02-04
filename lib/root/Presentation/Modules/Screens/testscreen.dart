@@ -2,17 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:teamclock/core/base/controllers/hive_class.dart';
 import 'package:teamclock/root/Data/models/alarm_item.dart';
-import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_ring.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/viewmodel/alarm_states.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_states.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 ReceivePort? globalReceivePort;
