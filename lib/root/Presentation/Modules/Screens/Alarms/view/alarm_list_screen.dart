@@ -18,6 +18,7 @@ import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:vibration/vibration.dart';
 
+@pragma("vm:entry-point")
 class AlarmListScreen extends ConsumerStatefulWidget {
   const AlarmListScreen({super.key});
 
@@ -217,27 +218,37 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
                       ),
                     ),
 
-                    // Test Section
+                    // Test/Edit Section
                     child: GestureDetector(
                       onLongPress: () {
-                        AlarmFunctions.editAlarm(context, ref, alarm);
-                        Vibration.vibrate(pattern: [100], intensities: [128]);
-                        print("VIBRATE");
+                        //? During debigging, the alarm was edited on LongPress.
+                        // AlarmFunctions.editAlarm(context, ref, alarm);
+                        // Vibration.vibrate(pattern: [100], intensities: [128]);
+                        // print("VIBRATE");
                       },
                       onTap: () async {
                         print("TAPPED: ID ${alarm.id}");
+
+                        //? Edit Alarm Function call on tap in final build
+                        AlarmFunctions.editAlarm(context, ref, alarm);
+                        Vibration.vibrate(pattern: [100], intensities: [128]);
                         // AlarmFunctions.fireAlarm(ref, alarm);
-                        await AndroidAlarmManager.oneShotAt(
-                          alarm.selectedTime,
-                          alarm.id,
-                          AlarmRing.alarmCallback,
-                          // AlarmRing.sendTestPortMessage,
-                          params: alarm.toJson(),
-                          exact: true,
-                          alarmClock: true,
-                          wakeup: true,
-                          allowWhileIdle: true,
-                        );
+
+                        //? The following lines of code were only for debugging purposes.
+                        //? Such that the alarm fires on tapping the alarm card. 
+                        //? The have been commented out in the final build. 
+
+                        // await AndroidAlarmManager.oneShotAt(
+                        //   alarm.selectedTime,
+                        //   alarm.id,
+                        //   AlarmRing.alarmCallback,
+                        //   // AlarmRing.sendTestPortMessage,
+                        //   params: alarm.toJson(),
+                        //   exact: true,
+                        //   alarmClock: true,
+                        //   wakeup: true,
+                        //   allowWhileIdle: true,
+                        // );
                       },
 
                       // Main ALARM CARD UI

@@ -1,10 +1,13 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'dart:developer';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:teamclock/core/base/controllers/notification_controller.dart';
+import 'package:teamclock/core/base/controllers/port_controller.dart';
 import 'package:teamclock/core/theme/theme_provider_class.dart';
 import 'package:teamclock/core/base/controllers/hive_class.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
@@ -41,6 +44,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static const platform = MethodChannel('com.team.teamclock/navigation');
 
   //? HIVE SAVE CHEATSHEET
   // 1 = Timezones
@@ -51,8 +55,10 @@ class _MyAppState extends State<MyApp> {
   // 6 = Settings
 
   @override
-  initState() {
+  void initState() {
+    super.initState();
     endSplash();
+    NotificationController.onColdStart();
   }
 
   void endSplash() async {
@@ -73,7 +79,7 @@ class _MyAppState extends State<MyApp> {
 
       // MAIN Material App
       return MaterialApp(
-        title: 'Time Slider',
+        title: 'Teamclock',
         themeMode: ref.watch(themeProvider), // Riverpod Theme
         theme: ThemeConstants.lightTheme,
         darkTheme: ThemeConstants.darkTheme,

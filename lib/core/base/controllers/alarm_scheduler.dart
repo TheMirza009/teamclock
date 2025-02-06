@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 class AlarmScheduler {
 
   // Main function
+  @pragma("vm:entry-point")
   static Future<void> scheduleAlarm(AlarmItem alarm) async {
     print("ALARM SCHEDULED for: ${alarm.id}");
     if (alarm.repeat == Weekday.none()) {
@@ -19,6 +20,7 @@ class AlarmScheduler {
   }
 
   // Only Rings once | No repitition
+  @pragma("vm:entry-point")
   static Future<void> _oneShot(AlarmItem alarm) async {
     await AndroidAlarmManager.oneShotAt(
       alarm.selectedTime,
@@ -33,6 +35,7 @@ class AlarmScheduler {
   }
 
   // Rings if other weekdays are selected
+  @pragma("vm:entry-point")
   static void _schedulePeriodicAlarms(AlarmItem alarm) {
     final now = tz.TZDateTime.now(tz.getLocation(alarm.timezone));
 
@@ -61,6 +64,7 @@ class AlarmScheduler {
   }
 
   // Weekly AndroidAlarmManager function call
+  @pragma("vm:entry-point")
   static void _scheduleWeeklyAlarm(AlarmItem alarm, tz.TZDateTime now, int weekday) async {
     final tz.TZDateTime scheduledTime = _nextInstanceOfWeekday(now, weekday, alarm.selectedTime);
 

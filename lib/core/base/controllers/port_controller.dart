@@ -7,6 +7,7 @@ class PortMessageController {
   static Function(Map<String, dynamic>)? _customHandler;
 
   /// Initializes the global ReceivePort
+  @pragma("vm:entry-point")
   static void initialize() {
     if (globalReceivePort == null) {
       globalReceivePort = ReceivePort();
@@ -28,6 +29,7 @@ class PortMessageController {
   }
 
   /// Sends a message using the global SendPort
+  @pragma("vm:entry-point")
   static void sendMessage(Map<String, dynamic> message) {
     final sendPort = IsolateNameServer.lookupPortByName('globalSendPort');
     if (sendPort != null) {
@@ -39,6 +41,7 @@ class PortMessageController {
   }
 
   /// Sets the custom logic for handling received messages
+  @pragma("vm:entry-point")
   static void handleReceived({required Function(Map<String, dynamic>) onReceived}) {
     _customHandler = onReceived;
   }

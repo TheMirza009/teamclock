@@ -213,6 +213,7 @@ static void triggerAlarms(WidgetRef ref) async {
 }
 
   // Add Alarm Function
+  @pragma("vm:entry-point")
   static Future<void> addAlarm(BuildContext context, WidgetRef ref) async {
     print((DateTime.now().hour % 12));
     showCupertinoModalPopup(

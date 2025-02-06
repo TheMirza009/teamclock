@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:teamclock/core/base/controllers/port_controller.dart';
 import 'package:teamclock/core/theme/theme_constants.dart';
+import 'package:teamclock/main.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Alarms/view/alarm_list_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Pomodoro/view/pomodoro_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Settings/settings_screen.dart';
 import 'package:teamclock/root/Presentation/Modules/Screens/Timezone/timezone_screen.dart';
 
+@pragma("vm:entry-point")
 class Homescreen extends StatelessWidget {
   final int passedIndex;
   const Homescreen({super.key, this.passedIndex = 0});

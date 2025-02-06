@@ -36,7 +36,7 @@ Future<void> openAlarmSettings() async {
                 style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.surfaceBright),
                 onPressed: openAlarmSettings,
                 child: Text('Open Alarm Settings', style: GoogleFonts.montserrat()),
-                        ),
+                ),
             ),
           ]
         ),

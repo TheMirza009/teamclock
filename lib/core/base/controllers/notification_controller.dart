@@ -170,6 +170,7 @@ class NotificationController {
     );
   }
 
+  @pragma("vm:entry-point")
   static void showAlarmNotification(AlarmItem alarm) {
     print("Triggering Alarm...");
     AwesomeNotifications().createNotification(
@@ -177,7 +178,7 @@ class NotificationController {
         id: alarm.id,
         channelKey: 'high_importance_channel', // Updated to match the initialized channelKey
         title:"${alarm.title} • ${TimezoneFunctions.getCityAndCountryFromTimezone(alarm.timezone)}",
-        body: "Currently ringing!",
+        body: "Currently ringing! \nTap to turn off.",
         notificationLayout: NotificationLayout.BigText,
         locked: true,
         payload: {
@@ -193,6 +194,41 @@ class NotificationController {
     );
   }
 
+  @pragma("vm:entry-point")
+  static Future<void> onColdStart() async {
+    ReceivedAction? initialAction = await AwesomeNotifications().getInitialNotificationAction();
+
+    if (initialAction != null) {
+      // App was launched by a notification
+      print('App launched by notification: ${initialAction.toMap()}');
+      // You can access details like:
+      // initialAction.id, initialAction.payload, initialAction.buttonKeyPressed, etc.
+
+      /// ALARM NAVIGATION FUNCTION
+      if (initialAction.payload?['alarmId'] != null || initialAction.buttonKeyPressed.isEmpty) {
+
+        // get alarm from payload
+        final alarmId = int.tryParse(initialAction.payload?['alarmId'] ?? '');
+        if (alarmId == null) {
+          print('Invalid alarm ID in notification payload.');
+          return;
+        }
+
+        // Set Alarm to Ringing in main isolate and Navigate to alarm list screen
+        AlarmRing.stopAlarm(alarmId);
+        await navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => const Homescreen(passedIndex: 2)),
+          (route) => false, // Remove all previous routes
+        );
+      }
+    } else {
+      // App was not launched by a notification
+      print('App not launched by a notification');
+    }
+  }
+
+  @pragma("vm:entry-point")
   static void setListeners(WidgetRef ref) {
     final timerNotifierProvider = PomodoroStates.timerNotifierProvider;
 
@@ -263,6 +299,7 @@ class NotificationController {
           print('Alarm with ID $alarmId stopped.');
         }
 
+        /// Navigate to AlarmScreen when notification tapped
         if (receivedAction.payload?['alarmId'] != null ||
             receivedAction.buttonKeyPressed.isEmpty) {
           
@@ -277,7 +314,7 @@ class NotificationController {
           // Set Alarm to Ringing in main isolate and Navigate to alarm list screen
           AlarmRing.stopAlarm(alarm.id);
           AlarmFunctions.finishAlarm(ref, alarm.id);
-          navigatorKey.currentState?.pushAndRemoveUntil(
+          await navigatorKey.currentState?.pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => const Homescreen(passedIndex: 2)),
             (route) => false, // Remove all previous routes
