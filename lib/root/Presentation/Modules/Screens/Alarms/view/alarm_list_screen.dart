@@ -145,7 +145,7 @@ class _AlarmListScreenState extends ConsumerState<AlarmListScreen> with TickerPr
         ],
       ),
       // title: Text('Alarm List', style: ThemeConstants.notBoldText(context))),
-      drawer: const DrawerContent(),
+      // drawer: const DrawerContent(),
       body: 
       isLoading
           ? const Center(

@@ -29,7 +29,7 @@ class SettingsScreen extends ConsumerWidget {
     void clearAllDataDialogue(BuildContext context) => showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text("Clear Tasks"),
+            title: const Text("Clear All data"),
             content: const Text("Are you sure you want to clear all data?"),
             actions: [
               // Close the dialogue

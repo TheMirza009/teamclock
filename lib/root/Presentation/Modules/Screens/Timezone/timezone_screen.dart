@@ -14,10 +14,26 @@ import 'package:teamclock/root/Presentation/Widgets/TimeZone%20components/timezo
 import 'package:teamclock/core/theme/theme_constants.dart';
 import 'package:teamclock/root/Presentation/Widgets/svgIcon.dart';
 
+final GlobalKey<_TimezonesScreenState> timezoneScreenKey = GlobalKey();
+
+
 class TimezonesScreen extends StatefulWidget {
   const TimezonesScreen({
     super.key,
   });
+
+   static void clearAllTimezones() async {
+    if (TimezoneStates.timezoneselections.isNotEmpty) {
+
+      // Save the updated time zones list
+      await HiveFunctions.saveTimeZones(
+        selectedTimeZone: TimezoneStates.selectedTimeZone,
+        timezoneList: TimezoneStates.timezoneselections,
+      );
+    } else {
+      debugPrint("No timezones to clear.");
+    }
+  }
 
   @override
   State<TimezonesScreen> createState() => _TimezonesScreenState();
@@ -163,7 +179,7 @@ class _TimezonesScreenState extends State<TimezonesScreen>  with SingleTickerPro
           ),
         ],
       ),
-      drawer: const DrawerContent(),
+      // drawer: const DrawerContent(),
       body: _buildBody(context),
     );
   }
@@ -257,6 +273,7 @@ class _TimezonesScreenState extends State<TimezonesScreen>  with SingleTickerPro
   }
 
   Widget _buildTimeZoneMiniWidgets() {
+
     return Column(
       children: TimezoneStates.timezoneselections.asMap().entries.map((entry) {
         final index = entry.key;
@@ -275,21 +292,38 @@ class _TimezonesScreenState extends State<TimezonesScreen>  with SingleTickerPro
                     timezoneList: TimezoneStates.timezoneselections,
                   );
                 },
-                child: TimeZoneMiniWidget(
-                  isSelected: TimezoneStates.selectedTimeZone == timezone,
-                  dynamicMinutes: counter,
-                  timezone: timezone,
-                  selectedTimeZone: TimezoneStates.selectedTimeZone,
-                  isFirst: isFirst,
-                  onDeletePressed: () async {
-                    setState(() {
-                      TimezoneStates.timezoneselections.remove(timezone);
-                    });
-                    await HiveFunctions.saveTimeZones(
+                child: Column(
+                  children: [
+                    TimeZoneMiniWidget(
+                      isSelected: TimezoneStates.selectedTimeZone == timezone,
+                      dynamicMinutes: counter,
+                      timezone: timezone,
                       selectedTimeZone: TimezoneStates.selectedTimeZone,
-                      timezoneList: TimezoneStates.timezoneselections,
-                    );
-                  },
+                      isFirst: isFirst,
+                      onDeletePressed: () async {
+                        setState(() {
+                          TimezoneStates.timezoneselections.remove(timezone);
+                        });
+                        await HiveFunctions.saveTimeZones(
+                          selectedTimeZone: TimezoneStates.selectedTimeZone,
+                          timezoneList: TimezoneStates.timezoneselections,
+                        );
+                      },
+                    ),
+                    TimezoneStates.timezoneselections.length == 1
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15),
+                            child: Text("Tap the + icon on top to \nadd a timezone.",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.montserrat(
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                  fontSize: ThemeConstants.getDynamicFontSize(18),
+                                  fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
                 ),
               )
             : Dismissible(

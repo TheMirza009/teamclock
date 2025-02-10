@@ -82,7 +82,7 @@ class PomodoroScreen extends ConsumerWidget {
           ),
         ],
       ),
-      drawer: const DrawerContent(),
+      // drawer: const DrawerContent(),
       body: const SingleChildScrollView(
         child: Column(
           children: 

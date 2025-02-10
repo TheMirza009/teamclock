@@ -47,7 +47,7 @@ class Homescreen extends StatelessWidget {
         tabBuilder: (context, index) {
           switch (index) {
             case 0:
-              return const TimezonesScreen();
+              return TimezonesScreen(key: timezoneScreenKey);
             case 1:
               return const PomodoroScreen();
             case 2:
