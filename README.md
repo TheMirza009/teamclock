@@ -98,10 +98,11 @@ This project was **designed and developed from scratch**. Every component, from 
 
 ## Screens
 
-<video controls autoPlay loop src="teamclock_splash.mp4" title="Splash"></video>
-<video controls autoPlay loop src="teamclock_screen_showcase.mp4" title="Screens"></video>
-<video controls autoplay loop src="teamclock_delete_all.mp4" title="Title"></video>
-
+<div align="center">
+  <video controls autoplay loop muted src="https://github.com/TheMirza009/teamclock/raw/cupertino_ui_updated/teamclock_splash.mp4" title="Splash" width="300"></video>
+  <video controls autoplay loop muted src="https://github.com/TheMirza009/teamclock/raw/cupertino_ui_updated/teamclock_screen_showcase.mp4" title="Screens" width="300"></video>
+  <video controls autoplay loop muted src="https://github.com/TheMirza009/teamclock/raw/cupertino_ui_updated/teamclock_delete_all.mp4" title="Title" width="300"></video>
+</div>
 ---
 
 *Developed with 🔥 for the global remote community.*
