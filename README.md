@@ -1,6 +1,7 @@
+![alt text](Assets/icons/teamclock_logo_splash_dark_cropped_2.png)
 
 ---
-# TeamClock 🕒
+<!-- # TeamClock 🕒 -->
 
 > "A productivity tool built for remote teams to manage time zones, working hours, and availability across distributed members. Built out of a real frustration working across time zones."
 
