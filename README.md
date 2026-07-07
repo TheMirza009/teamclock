@@ -12,7 +12,7 @@ This was designed as a project during my internship.
 
 ## ✨ Features
 
-* **📱 iOS-Inspired Theme:** A premium, glassmorphic UI designed for a native, high-end user experience.
+* **📱 iOS-Inspired Theme:** A clean, modern UI designed for a native, high-end user experience.
 * **🎚️ 24-Hour Time Slider:** Effortlessly slide through a 24-hour window to see how time changes across all selected zones simultaneously.
 * **⏰ International Alarms:** Set alarms tied to specific timezones using robust background services.
 * **⏳ Integrated Pomodoro:** A built-in focus timer to help you transition from scheduling to deep work.
